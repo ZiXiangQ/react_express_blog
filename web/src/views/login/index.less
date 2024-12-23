@@ -17,7 +17,47 @@
   border-radius: 8px;                  /* 圆角 */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 阴影效果 */
   width: 400px;                        /* 固定宽度 */
-  max-width: 100%;   
+  max-width: 100%;   // src/components/Login.less
+  .login-container {
+    display: flex;
+    justify-content: flex-end; /* 把表单推到右边 */
+    align-items: center;        /* 垂直居中对齐 */
+    height: 100vh;             /* 设置容器填满视口高度 */
+    width: 100vw;              /* 设置容器填满视口宽度 */
+    position: fixed;           /* 固定位置，确保满屏 */
+    top: 0;                    /* 从顶部开始 */
+    left: 0;                   /* 从左侧开始 */
+    background: linear-gradient(135deg, #74ebd5, #9face6); /* 初始渐变背景 */
+    background-size: 400% 400%; /* 为渐变增加大小以支持动画 */
+    animation: gradientAnimation 15s ease infinite; /* 添加动画 */
+  }
+
+  @keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .form-container {
+    background: rgba(255, 255, 255, 0.9); /* 半透明白色 */
+    padding: 40px;                       /* 内边距 */
+    border-radius: 8px;                  /* 圆角 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+    width: 400px;                        /* 固定宽度 */
+    max-width: 100%;   
+    margin-right: 100px;                  /* 确保在小屏幕下的适配 */
+  }
+
+  h2 {
+    justify-content: center;
+    color: #9face6;
+    margin-bottom: 20px; /* 增加标题与表单之间的间隙 */
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px; /* 设置表单项之间的间隙 */
+  }
+
   margin-right:100px ;                  /* 确保在小屏幕下的适配 */
 }
 
