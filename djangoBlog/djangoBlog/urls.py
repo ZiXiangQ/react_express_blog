@@ -1,6 +1,6 @@
 '''
 Author: qiuzx
-Date: 2024-12-21 16:06:52
+Date: 2024-12-23 14:56:54
 LastEditors: qiuzx
 Description: description
 '''
@@ -9,5 +9,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/user/', include('user.urls')),  # 包含 user_service 的 URLs
+    path('user_handle/', include('user_handle.urls')),  # 引用 user 应用的 URL 路由
 ]
