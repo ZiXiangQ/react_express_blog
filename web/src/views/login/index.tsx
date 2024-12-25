@@ -1,19 +1,29 @@
-// src/components/Login.jsx
+/*
+ * @Author: qiuzx
+ * @Date: 2024-12-19 15:04:29
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
 import React from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import './index.less'; // 引入样式文件
 import BasicService from '@/services/api/base/base';
+import { LoginValues } from '@/types/base';
+import { useNavigate } from 'react-router-dom';
 
-interface LoginValues {
-    username: string; // 用户名
-    password: string; // 密码
-}
 
 
 const Login = () => {
+    const navigate = useNavigate()
+
+    
     const onFinish = (values: LoginValues) => {
         BasicService.login(values).then((res) => {
             console.log(res);
+            if(res.code == 'ok') {
+                message.success('登录成功');
+                navigate("/clientHandle")
+            }
         });
     };
 

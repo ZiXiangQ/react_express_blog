@@ -7,15 +7,15 @@
 
 import HttpClient from "@/services/httpClient";
 import { RspModel ,PostBodyModel} from "@/services/httpClient"
-import { LoginData, LoginParam } from "@/types/base"
+import { LoginData, LoginValues } from "@/types/base"
 
 class basicService {
-    login(param: LoginParam) {
-        const api = "/account/login"
-        return HttpClient.post<LoginData, LoginParam>(api, param)
+    login(param: LoginValues) {
+        const api = "/user_handle/login/"
+        return HttpClient.post<LoginData, LoginValues>(api, param)
     }
     logout() {
-        const api = "/account/logout"
+        const api = "/user_handle/logout"
         return HttpClient.post<RspModel, PostBodyModel>(api,{})
     }
 }

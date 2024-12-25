@@ -44,17 +44,18 @@ axios.interceptors.response.use(
     (response: AxiosResponse): Promise<AxiosResponse> => {
     // 从第一次登录接口接收sid
         if (response.headers.sid) {
-            console.log(response.headers.sid)
-            setCookie("sid", response.headers.sid);
+            setCookie("token", response.headers.sid);
         }
         if(response.data.code === -2001){
             window.location.hash="/login"
             window.location.reload()
         }
+        console.log(response.data);
         return Promise.resolve(response);
     },
     (err) => {
         message.destroy();
+        console.log(err);
         message.error("请求失败");
         return Promise.reject(err);
     }

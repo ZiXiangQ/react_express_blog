@@ -16,7 +16,7 @@ export default defineConfig({
         host: '0.0.0.0',
         proxy: {
             "/mid_service": {
-                target: "http://192.168.43.99:11055/",
+                target: "http://127.0.0.1:11055/",
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/mid_service/, ""),
             },

@@ -1,0 +1,33 @@
+/* PageLayout.less */
+.layout {
+  height: 100vh; // 使布局填满整个视口高度
+  width: 100vw; // 使布局填满整个视口宽度
+  display: flex;
+  flex-direction: column;
+
+  .header {
+      height: 64px; // 根据 Ant Design 默认 Header 高度
+      .title {
+          font-size: 24px; // 标题字体大小
+          font-weight: bold; // 标题加粗
+          line-height: 64px; // 标题行高
+          margin-left: 24px; // 标题左侧留白
+          color: #e2dcdc;
+      }
+  }
+
+  .content {
+      flex: 1; // 占据剩余空间
+      display: flex;
+  }
+
+  .sider {
+      width: 200px; // Sider 固定宽度
+  }
+
+  .footer {
+      text-align: center;
+      padding: 16px;
+      background: #f0f2f5; // 您可以根据需要调整背景颜色
+  }
+}

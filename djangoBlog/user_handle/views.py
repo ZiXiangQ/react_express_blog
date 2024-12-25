@@ -24,15 +24,17 @@ def generate_token():
 def login(request):##登录
     username = request.data.get('username')
     password = request.data.get('password')
-    print(username, password,'ddddd')
     try:
         user = User.objects.get(username=username)
         if user.password == md5_hash(password):
-            return Response({'code': 200, 'message': '登录成功', 'data' : {'token': generate_token()}})
+            token = generate_token()
+            response = Response({'code': 'ok', 'message': '登录成功'})
+            response['sid'] = f'{token}'  # 在 header 中添加 token
+            return response        
         else:
-            return Response({'code': 400, 'message': '用户名或密码错误'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'code': 'ok', 'message': '用户名或密码错误'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
-        return Response({'code': 400, 'message': '用户名或密码错误'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'code': 'ok', 'message': '用户不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def create_user(request):##创建用户
@@ -68,7 +70,7 @@ def update_user(request, user_id):##更新用户信息
         return Response({'message': '更新成功', 'data': serializer.data, 'status':status.HTTP_200_OK})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['DELETE'])
+@api_view(['DELETE','POST'])
 def delete_user(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
@@ -84,7 +86,7 @@ def modify_password(request, user_id):
         password = request.data.get('password')
         user.password = md5_hash(password)
         user.save()
-        return Response({'code': 200, 'message': '密码修改成功'}, status=status.HTTP_200_OK)
+        return Response({'code': 'ok', 'message': '密码修改成功'}, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'code': 404, 'message': '用户未找到'}, status=status.HTTP_404_NOT_FOUND)
 

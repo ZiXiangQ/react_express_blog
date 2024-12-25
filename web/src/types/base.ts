@@ -1,4 +1,9 @@
-// 登录请求返回
+/*
+ * @Author: qiuzx
+ * @Date: 2024-12-19 16:40:09
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
 
 import { PostBodyModel, RspModel } from "@/services/httpClient";
 
@@ -10,13 +15,16 @@ export interface LoginData extends RspModel {
     data: LoginProp;
 }
 
-export interface LoginParam extends PostBodyModel {
-    user: string;
-    password: string;
+export interface LoginValues {
+    username: string; // 用户名
+    password: string; // 密码
 }
+
+
 export interface LogoutParam extends PostBodyModel {
     sid: string | null
 }
+
 //字典值
 export interface dict {
     key:string;
@@ -40,24 +48,7 @@ export interface dictData extends RspModel {
 export interface pageProp {
     page_id: number;
     page_size: number;
-  }
-
-// 个人中心
-export interface personParam extends PostBodyModel {
-    new_password: string;
-    old_password: string;
-  }
-
-export interface selectData {
-    label: string;
-    value: string | number;
 }
 
-//筛选条件
-export interface relayIdProp {
-    relay_id: string
-}
-//文件导出
-export interface fileProp {
-    file_name:string;
-}
+// 登录请求返回
+

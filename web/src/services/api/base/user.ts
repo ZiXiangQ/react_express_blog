@@ -1,11 +1,3 @@
-/*
- * @Description:
- * @Author: qiuzx
- * @Date: 2023-04-04 14:22:36
- * @LastEditTime: 2023-04-04 15:40:18
- * @LastEditors: qiuzx
- * Copyright 2018 CFFEX.  All rights reserved.
- */
 import HttpClient, { RspModel } from "@/services/httpClient";
 import { PostBodyModel } from "@/services/httpClient";
 import { resetParam, userData, UserId, UserProps } from "@/types/user";
