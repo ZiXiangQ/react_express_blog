@@ -1,16 +1,20 @@
+/*
+ * @Author: qiuzx
+ * @Date: 2024-12-19 15:02:42
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
  
-// import PageLayout from "@/components/PageLayout"
 // import {
 //     LineChartOutlined,
-//     AppstoreOutlined,
-//     BarChartOutlined,
-//     TeamOutlined
 // } from "@ant-design/icons" // meta.icon设置菜单图标，仅设置一级菜单即可
 import { RoutesTypeNew } from "@/types/routes"
 import Index from "@/views/login/index"
 import Page403 from "@/views/errorPage/page403"
 import Page404 from "@/views/errorPage/page404"
 import PageLayout from "@/views/PageLayout"
+import UserHandle from "@/views/userHandle"
+import ClientMain from "@/views/clientMain"
 
 /**
  * @description: 全局路由配置
@@ -27,15 +31,29 @@ const routes: RoutesTypeNew = [
         redirect: "/login",
     },
     {
-        path: "clientHandle",
+        path: "/",
         element:<PageLayout />,
-        meta: {
-            title: "客户信息管理",
-            // noLogin: false,
-            // icon: <LineChartOutlined />
-        },
+        children: [
+            {
+                path: "clientMain",
+                element: <ClientMain />,
+                meta: {
+                    title: "首页",
+                    // icon: <LineChartOutlined />,
+                    accessId: "dashboard",
+                },
+            },
+            {
+                path: "userHandle",
+                element: <UserHandle />,
+                meta: {
+                    title: "首页",
+                    // icon: <LineChartOutlined />,
+                    accessId: "dashboard",
+                },
+            },
+        ]
     },
-    
     {
         path: "/login",
         element: <Index />,

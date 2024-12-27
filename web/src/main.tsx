@@ -5,15 +5,17 @@
  * @Description: description
  */
 import './index.css'
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { HashRouter } from "react-router-dom"
 import RouterWaiter from "react-router-waiter"
 import { routes } from "../router"
 
-ReactDOM.render(
+const container = document.getElementById("root")
+const root = ReactDOM.createRoot(container!)
+
+root.render(
     // antd的侧边栏SubMenu菜单展开时控制台会报错，暂时关闭StrictMode
     <HashRouter>
         <RouterWaiter routes={routes} />
     </HashRouter>,
-  document.getElementById("root")
 );

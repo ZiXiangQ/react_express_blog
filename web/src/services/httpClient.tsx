@@ -4,20 +4,22 @@
  * @LastEditors: qiuzx
  * @Description: description
  */
+import { AxiosResponse } from "axios";
 import axios from ".";
 import { message } from "antd";
 
 export interface RspModel {
     code: number | string;
     message: string;
+    data?:unknown;
 }
 
-export interface PostBodyModel {}
+export type PostBodyModel = object
 
 class HttpClient {
     constructor() {}
 
-    private async handleResponse<T>(promise: Promise<any>): Promise<T> {
+    private async handleResponse<T extends RspModel>(promise: Promise<AxiosResponse<T>>): Promise<T> {
         try {
             const rsp = await promise;
             if (rsp.data && rsp.data.code !== 'ok') {
@@ -40,9 +42,9 @@ class HttpClient {
         return this.handleResponse(axios.post<T>(api, body));
     }
 
-    async upload<T extends RspModel, V extends PostBodyModel>(api: string, body: V, params?: any): Promise<T> {
-        return this.handleResponse(axios.post<T>(api, body, { ...params }));
-    }
+    // async upload<T extends RspModel, V extends PostBodyModel>(api: string, body: V, params?: any): Promise<T> {
+    //     return this.handleResponse(axios.post<T>(api, body, { ...params }));
+    // }
 }
 
 const httpClient = new HttpClient();

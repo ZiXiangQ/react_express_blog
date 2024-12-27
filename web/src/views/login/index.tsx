@@ -12,17 +12,16 @@ import { LoginValues } from '@/types/base';
 import { useNavigate } from 'react-router-dom';
 
 
-
 const Login = () => {
     const navigate = useNavigate()
-
     
     const onFinish = (values: LoginValues) => {
         BasicService.login(values).then((res) => {
             console.log(res);
             if(res.code == 'ok') {
                 message.success('登录成功');
-                navigate("/clientHandle")
+                navigate("/clientMain")
+                localStorage.setItem('username', values.username)
             }
         });
     };
