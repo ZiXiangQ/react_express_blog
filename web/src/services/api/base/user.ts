@@ -1,36 +1,26 @@
 import HttpClient, { RspModel } from "@/services/httpClient";
 import { PostBodyModel } from "@/services/httpClient";
-import { resetParam, userData, UserId, UserProps } from "@/types/user";
+import {  userData, userParam } from "@/types/user";
 
 class userService {
-    get_user_infos(){
-        const api = "/user/get_user_infos";
+    create(param:userParam){ 
+        const api = "/user_handle/create";
+        return HttpClient.post<RspModel,userParam>(api,param)
+    }
+
+    modify_user(param:userParam){
+        const api = `/user_handle/${param.id}/update`;
+        return HttpClient.post<RspModel,userParam>(api,param)
+    }
+
+    delete_user(param:userParam){
+        const api = `/user_handle/${param.id}/delete`;
+        return HttpClient.post<RspModel,userParam>(api,param)
+    }
+
+    get_user_list(){
+        const api = '/user_handle/get_all_user';
         return HttpClient.post<userData,PostBodyModel>(api,{})
-    }
-
-    modify_user_info(param:UserProps){
-        const api = "/user/modify_user_info";
-        return HttpClient.post<RspModel,UserProps>(api,param)
-    }
-
-    add_user_info(param:UserProps){
-        const api = '/user/add_user_info';
-        return HttpClient.post<RspModel,UserProps>(api,param)
-    }
-
-    reset_user_password(param:resetParam){
-        const api = '/user/reset_user_password';
-        return HttpClient.post<RspModel,resetParam>(api,param)
-    }
-
-    lock_user_status(param:UserId){
-        const api = '/user/lock_user_status';
-        return HttpClient.post<RspModel,UserId>(api,param)
-    }
-
-    unlock_user_status(param:UserId){
-        const api = '/user/unlock_user_status';
-        return HttpClient.post<RspModel,UserId>(api,param)
     }
 }
 

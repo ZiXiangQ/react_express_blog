@@ -20,6 +20,9 @@ def md5_hash(password):
 def generate_token():
     return hashlib.sha256(os.urandom(32)).hexdigest()  
 
+def custom_response(code, message, data=None, status=status.HTTP_200_OK):
+    return Response({'code': code,'message': message, 'data': data}, status=status)
+
 @api_view(['POST'])
 def login(request):##登录
     username = request.data.get('username')
@@ -42,28 +45,28 @@ def create_user(request):##创建用户
     if serializer.is_valid():
         serializer.validated_data['password'] = md5_hash(serializer.validated_data['password'])
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return custom_response(201, '用户创建成功', serializer.data)
+    return custom_response(400, '用户创建失败', serializer.errors)
 
 @api_view(['POST'])
 def get_user(request, user_id=None):##获取用户信息
     if user_id is None:
         users = User.objects.all()
         serializer = UserHandleSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return custom_response('ok', '获取用户信息成功', serializer.data)
     try:
         user = User.objects.get(pk=user_id)
         serializer = UserHandleSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return custom_response('ok', '获取用户信息成功', serializer.data)
     except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return custom_response('ok', '用户未找到', status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['PUT','POST'])
 def update_user(request, user_id):##更新用户信息
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return custom_response(404, '用户未找到', status=status.HTTP_404_NOT_FOUND)
     serializer = UserHandleSerializer(user, data=request.data, partial=True)##部分更新
     if serializer.is_valid():
         serializer.save()

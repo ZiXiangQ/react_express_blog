@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Dropdown, Layout, Menu, Tooltip } from 'antd';
+import { Dropdown, Layout, Menu } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom'; // 导入 Outlet
 import './index.less'; // 导入 Less 样式
 
@@ -75,13 +75,13 @@ const PageLayout: React.FC = () => {
           style={{ flexGrow: 1, justifyContent: 'center' }} // 新增样式
         />
         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-        <Dropdown overlay={menu} trigger={['click']}>
-          <Tooltip title="Click to logout and userhandle" placement="bottom"> {/* 添加 Tooltip 组件 */}
+        <Dropdown overlay={menu}>
+          {/* <Tooltip title="Click to logout and userhandle" placement="bottom"> 添加 Tooltip 组件 */}
             <div className="hoverable" style={{ cursor: 'pointer', padding: '10px 0 0 10px' }}>
               <UserOutlined style={{ fontSize: '20px', margin: '0 10px', color: '#000' }} />
               <span style={{ margin: '0 10px 0 0' }}>{username || "游客"}</span> {/* 如果 username 为空，则显示 "游客" */}
             </div>
-          </Tooltip>
+          {/* </Tooltip> */}
         </Dropdown>
         </div>
       </Header>

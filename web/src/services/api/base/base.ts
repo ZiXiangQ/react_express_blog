@@ -11,7 +11,7 @@ import { LoginData, LoginValues } from "@/types/base"
 
 class basicService {
     login(param: LoginValues) {
-        const api = "/user_handle/login/"
+        const api = "/user_handle/login"
         return HttpClient.post<LoginData, LoginValues>(api, param)
     }
     logout() {
