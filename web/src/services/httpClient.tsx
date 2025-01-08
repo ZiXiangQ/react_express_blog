@@ -22,7 +22,7 @@ class HttpClient {
     private async handleResponse<T extends RspModel>(promise: Promise<AxiosResponse<T>>): Promise<T> {
         try {
             const rsp = await promise;
-            if (rsp.data && rsp.data.code !== 'ok') {
+            if (rsp.data && rsp.data.code !== "0") {
                 message.error(rsp.data.message);
                 throw new Error(rsp.data.message); // 抛出错误以便外部捕获
             }
@@ -41,10 +41,6 @@ class HttpClient {
     async post<T extends RspModel, V extends PostBodyModel>(api: string, body: V): Promise<T> {
         return this.handleResponse(axios.post<T>(api, body));
     }
-
-    // async upload<T extends RspModel, V extends PostBodyModel>(api: string, body: V, params?: any): Promise<T> {
-    //     return this.handleResponse(axios.post<T>(api, body, { ...params }));
-    // }
 }
 
 const httpClient = new HttpClient();

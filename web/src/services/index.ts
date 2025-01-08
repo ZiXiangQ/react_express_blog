@@ -50,7 +50,6 @@ axios.interceptors.response.use(
             window.location.hash="/login"
             window.location.reload()
         }
-        console.log(response.data);
         return Promise.resolve(response);
     },
     (err) => {

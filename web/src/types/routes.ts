@@ -13,6 +13,7 @@ export interface RoutesItemTypeNew extends RoutesItemType {
   url?: string;
   path?: string;
   element?: unknown;
+  children?:RoutesItemTypeNew[]
 }
 
 export type RoutesTypeNew = RoutesItemTypeNew[];

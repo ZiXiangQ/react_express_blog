@@ -7,7 +7,7 @@
 import React from 'react';
 import { Form, Input, Button, message } from 'antd';
 import './index.less'; // 引入样式文件
-import BasicService from '@/services/api/base/base';
+import BasicService from '@/services/api/base';
 import { LoginValues } from '@/types/base';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +18,7 @@ const Login = () => {
     const onFinish = (values: LoginValues) => {
         BasicService.login(values).then((res) => {
             console.log(res);
-            if(res.code == 'ok') {
+            if(res.code == 0) {
                 message.success('登录成功');
                 navigate("/clientMain")
                 localStorage.setItem('username', values.username)

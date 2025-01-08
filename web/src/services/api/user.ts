@@ -15,12 +15,17 @@ class userService {
 
     delete_user(param:userParam){
         const api = `/user_handle/${param.id}/delete`;
-        return HttpClient.post<RspModel,userParam>(api,param)
+        return HttpClient.post<RspModel,PostBodyModel>(api,{})
     }
 
     get_user_list(){
         const api = '/user_handle/get_all_user';
         return HttpClient.post<userData,PostBodyModel>(api,{})
+    }
+
+    modify_password(param:userParam){
+        const api = `/user_handle/${param.id}/modify_password`;
+        return HttpClient.post<RspModel,userParam>(api,param)
     }
 }
 

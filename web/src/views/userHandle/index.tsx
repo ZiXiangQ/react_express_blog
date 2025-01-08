@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Space, Tag } from 'antd';
+import { Table, Button, Space, Tag, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import UserService from '@/services/api/base/user';
+import UserService from '@/services/api/user';
 import { userParam } from '@/types/user';
 import UserEdit from './components/userEdit';
 
 interface User {
   id: number;
-  name: string;
+  username: string;
   email: string;
+  password: string;
+  is_active: boolean;
 }
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<userParam[]>([]);
-  const [newUser, setNewUser] = useState<userParam>({ id: 0, username: '', email: '' , password: '' , is_active: 1 });
+  const [newUser, setNewUser] = useState<userParam>({ id: 0, username: '', email: '', password: '', is_active: true });
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const [modalTitle, setModalTitle] = useState('添加用户');
   useEffect(() => {
     getUserInfo();
     return () => {
@@ -23,30 +25,39 @@ const UserManagement: React.FC = () => {
   }, []);
 
   const getUserInfo = () => {
-    UserService.get_user_list().then(res => { 
+    UserService.get_user_list().then(res => {
       setUsers(res.data)
     }) // TO: 获取用户信息
   };
 
 
   const deleteUser = (id: number) => {
-    UserService.delete_user({id}).then(() => {
+    console.log(id)
+    UserService.delete_user({ id }).then((res) => {
+      console.log(res)
       getUserInfo();
     }) // TO: 删除用户信息
   };
 
-  const showModal = (type: 'add' | 'edit', user?: User) => {
+  const showModal = (type: 'add' | 'edit' | 'password', user?: User) => {
     if (type === 'add') {
+      setModalTitle('添加用户');
       setIsModalVisible(true);
-      setNewUser({ id: 0, username: '', email: '', password: '', is_active: 1 });
+      setNewUser({ id: 0, username: '', email: '', password: '', is_active: true });
     } else if (type === 'edit' && user) {
+      setModalTitle('编辑用户');
       setNewUser(user);
+      setIsModalVisible(true);
+    } else if (type === 'password' && user) {
+      setModalTitle('修改密码');
+      setNewUser({ ...user, password: '' });
       setIsModalVisible(true);
     }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    getUserInfo();
   };
 
   const columns = [
@@ -54,6 +65,7 @@ const UserManagement: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      width: 80,
     },
     {
       title: '姓名',
@@ -69,7 +81,8 @@ const UserManagement: React.FC = () => {
       title: '状态',
       dataIndex: 'is_active',
       key: 'is_active',
-      render: (is_active: number) => <Tag color={is_active === 1 ? 'green' : 'volcano'}>{is_active === 1 ? '活跃' : '冻结'}</Tag>
+      render: (is_active:
+        boolean) => <Tag color={is_active === true ? 'green' : 'volcano'}>{is_active === true ? '活跃' : '冻结'}</Tag>
     },
     {
       title: '操作',
@@ -77,11 +90,18 @@ const UserManagement: React.FC = () => {
       render: (user: User) => (
         <Space size="middle">
           <Button type="link" onClick={() => showModal('edit', user)}>
-            <EditOutlined />
+            <EditOutlined />编辑用户
           </Button>
-          <Button type="link" onClick={() => deleteUser(user.id)}>
-            <DeleteOutlined />
-          </Button>
+          <Button type='link' onClick={() => showModal('password',user)}>修改密码</Button>
+          <Popconfirm
+            okText="确认"
+            cancelText="取消"
+            title="确认删除？"
+            onConfirm={() => deleteUser(user.id)}>
+            <Button type="link">
+              <DeleteOutlined />删除用户
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -89,17 +109,18 @@ const UserManagement: React.FC = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: "space-between",alignContent: "center",alignItems: "center" }}>
-      <h2>用户信息</h2>
-      <Button type="primary" onClick={() => showModal('add')} icon={<PlusOutlined />}>
-        添加新用户
-      </Button>
+      <div style={{ display: 'flex', justifyContent: "space-between", alignContent: "center", alignItems: "center" }}>
+        <h2>用户信息</h2>
+        <Button type="primary" onClick={() => showModal('add')} icon={<PlusOutlined />}>
+          添加新用户
+        </Button>
       </div>
       <Table dataSource={users} columns={columns} rowKey="id" />
-      <UserEdit 
-        visible={isModalVisible}
-        onCancel={handleCancel}
+      <UserEdit
+        isModalVisible={isModalVisible}
         user={newUser}
+        modalTitle={modalTitle}
+        handlecancel={handleCancel}
       />
     </div>
   );

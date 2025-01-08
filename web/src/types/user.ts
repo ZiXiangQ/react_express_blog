@@ -10,8 +10,9 @@ export interface userParam {
     id?:number;
     username?:string;
     password?:string;
+    password1?:string;
     email?:string;
-    is_active?:number;
+    is_active?:boolean;
 }
 
 export interface userData extends RspModel {

@@ -1,20 +1,13 @@
-/*
- * @Author: qiuzx
- * @Date: 2024-12-19 15:02:42
- * @LastEditors: qiuzx
- * @Description: description
- */
- 
-// import {
-//     LineChartOutlined,
-// } from "@ant-design/icons" // meta.icon设置菜单图标，仅设置一级菜单即可
-import { RoutesTypeNew } from "@/types/routes"
-import Index from "@/views/login/index"
-import Page403 from "@/views/errorPage/page403"
-import Page404 from "@/views/errorPage/page404"
-import PageLayout from "@/views/PageLayout"
-import UserHandle from "@/views/userHandle"
-import ClientMain from "@/views/clientMain"
+// src/router/index.tsx
+import Index from '@/views/login/index';
+import Page403 from '@/views/errorPage/page403';
+import Page404 from '@/views/errorPage/page404';
+import PageLayout from '@/views/PageLayout';
+import UserHandle from '@/views/userHandle';
+import ClientMain from '@/views/clientMain';
+import FileList from '@/views/fileList';
+import FileContent from '@/views/fileContent';
+import { RoutesTypeNew } from '@/types/routes';
 
 /**
  * @description: 全局路由配置
@@ -32,7 +25,7 @@ const routes: RoutesTypeNew = [
     },
     {
         path: "/",
-        element:<PageLayout />,
+        element: <PageLayout />,
         children: [
             {
                 path: "clientMain",
@@ -47,12 +40,33 @@ const routes: RoutesTypeNew = [
                 path: "userHandle",
                 element: <UserHandle />,
                 meta: {
-                    title: "首页",
+                    title: "用户管理",
                     // icon: <LineChartOutlined />,
-                    accessId: "dashboard",
+                    accessId: "userHandle",
                 },
             },
-        ]
+            {
+                path: "fileList",
+                element: <FileList />,
+                meta: {
+                    title: "文件列表",
+                    // icon: <LineChartOutlined />,
+                    accessId: "fileList",
+                },
+            },
+            {
+                path: "file/:filePath",
+                element: <FileContent />,
+                meta: {
+                    title: "文件内容",
+                    hideMenu: true,
+                },
+            },
+            {
+                path:"project/febao",
+                element: <FileList />,
+            }
+        ],
     },
     {
         path: "/login",
@@ -81,33 +95,6 @@ const routes: RoutesTypeNew = [
             hideMenu: true,
         },
     },
-]
+];
 
-/**
- * @description: 全局路由拦截
- * @param {string} pathname 当前路由路径
- * @param {object} meta 当前路由自定义meta字段
- * @return {string} 需要跳转到其他页时就return一个该页的path路径
- */
-// const onRouteBefore: OnRouteBeforeType = ({ pathname, meta }) => {
-//     const value = useAppSelector((store) =>store.user)
-//     // const { commonStore } = useSelector((store) => store.user)
-//     if (!meta.noLogin) {
-//         if (value.sid) {
-//             // 用户是否已登录
-//             const { accessId } = meta
-//             const message = `${pathname},${meta.title || ""}`
-//             const path403 = `/403?message=${encodeURIComponent(message)}`
-//             if (!getIsCanAccess(accessId)) {
-//                 return path403
-//             }
-//         } else {
-//             return "/login"
-//         }
-//     }else{
-//         return "/login"
-//     }
-// }
-
-// export { routes, onRouteBefore };
 export { routes };
