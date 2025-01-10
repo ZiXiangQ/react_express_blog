@@ -6,4 +6,5 @@ node_modules
 .env.development
 .env.production
 data*
-
+venv
+__pycache__

@@ -20,7 +20,7 @@ const Login = () => {
             console.log(res);
             if(res.code == 0) {
                 message.success('登录成功');
-                navigate("/clientMain")
+                navigate("/home")
                 localStorage.setItem('username', values.username)
             }
         });

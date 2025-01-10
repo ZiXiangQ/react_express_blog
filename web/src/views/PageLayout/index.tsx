@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
 import { Dropdown, Layout, Menu } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom'; // 导入 Outlet
-import './index.less'; // 导入 Less 样式
 import ProjectService from '@/services/api/project';
-import { projectItem, projectList } from '@/types/project';
+import { childProjectItem, folderKey, projectItem, projectList } from '@/types/project';
+import LeftMenu from './component/leftMenu';
+import './index.less';
 
 const PageLayout: React.FC = () => {
   const { Header, Content, Footer } = Layout;
@@ -14,6 +15,8 @@ const PageLayout: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
   const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
+  const [leftMenuData, setLeftMenuData] = useState<folderKey>();
+  const projectKey  = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
 
   // 获取用户信息
@@ -35,6 +38,29 @@ const PageLayout: React.FC = () => {
     });
   }, []);
 
+  const get_children_tree = (currentKey: string) => {
+    ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
+      setLeftMenuData(rsp.data);
+      console.log('rsp', rsp);
+    })
+  }
+
+  // 顶部导航菜单点击事件
+  const handleMenuClick = ({ key }: { key: string }) => {
+    console.log('key', key);
+    console.log('projectsList', projectsList);
+    const selectedRoute = projectItems.find(route => route?.key === key);
+    console.log('selectedRoute', selectedRoute);
+    if (selectedRoute) {
+      projectKey.current = key;
+      get_children_tree(key)
+      if(key == 'home'){
+        navigate('/home'); // 跳转到首页
+      }else{
+        navigate(`/${selectedRoute.key}`); // 跳转到对应的项目页面
+      }
+    }
+  };
 
   // 退出登录处理
   const handleLogout = () => {
@@ -56,17 +82,11 @@ const PageLayout: React.FC = () => {
           type: 'item',
         }))
         : [{ key: 'loading', label: '加载中...', type: 'item' }];
+      projectItems.unshift({ key: 'home', label: '首页', type: 'item' });
+      console.log('projectItems', projectItems);
       setProjcetsItems(projectItems);
     }
   }, [loading, projectsList]);
-
-  // 顶部导航菜单点击事件
-  const handleMenuClick = ({ key }: { key: string }) => {
-    const selectedRoute = projectsList.find(route => route.project_key === key);
-    if (selectedRoute) {
-      navigate(`/project/${selectedRoute.project_key}`); // 跳转到对应的项目页面
-    }
-  };
 
   // 用户操作菜单
   const menu = (
@@ -82,6 +102,7 @@ const PageLayout: React.FC = () => {
 
   return (
     <Layout className="layout">
+
       <Header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="demo-logo" />
         <span className="title">Ant Design Pro</span>
@@ -101,12 +122,18 @@ const PageLayout: React.FC = () => {
         </div>
       </Header>
 
-      <Content className="content" style={{ marginTop: '10px' }}>
-        <Outlet /> {/* 渲染子路由的内容 */}
-      </Content>
+      <Layout className="main-layout">
+        {leftMenuData && <LeftMenu data={leftMenuData} projectKey={projectKey.current} />}
+        <Layout style={{ padding: '0 24px 24px' }}>
+          <Content className="content" style={{ padding: '24px', marginTop: '10px' }}>
+            <Outlet /> {/* 渲染子路由的内容 */}
+          </Content>
+        </Layout>
+      </Layout>
+
 
       <Footer className="footer">
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
+        Ant Design ©{new Date().getFullYear()} Created by PkaQ
       </Footer>
     </Layout>
   );

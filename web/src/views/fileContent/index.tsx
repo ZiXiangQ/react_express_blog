@@ -5,20 +5,25 @@
  * @Description: description
  */
 // src/components/FileContent.tsx
+import ProjectService from '@/services/api/project';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const FileContent: React.FC = () => {
-    const { filePath } = useParams<{ filePath: string }>();
+    const { projectKey, filePath } = useParams<{ projectKey: string; filePath: string }>();
     const [content, setContent] = useState<string>('');
 
     useEffect(() => {
-        if (filePath) {
-            fetch(`/api/files/${filePath}/`)
-                .then(response => response.json())
-                .then(data => setContent(data.content))
-                .catch(error => console.error('Error fetching file content:', error));
+        if (!filePath) {
+            return;
         }
+        const decodedFilePath = decodeURIComponent(filePath);
+        console.log('Decoded file path:', projectKey);
+        console.log('Fetching file content:', decodedFilePath);
+        ProjectService.get_file_content({"file_path": decodedFilePath})
+           .then(rsp => setContent(rsp.data.content))
+           .catch(error => console.error('Error fetching file content:', error));
+
     }, [filePath]);
 
     return (

@@ -4,10 +4,9 @@ import Page403 from '@/views/errorPage/page403';
 import Page404 from '@/views/errorPage/page404';
 import PageLayout from '@/views/PageLayout';
 import UserHandle from '@/views/userHandle';
-import ClientMain from '@/views/clientMain';
-import FileList from '@/views/fileList';
 import FileContent from '@/views/fileContent';
 import { RoutesTypeNew } from '@/types/routes';
+import HomePage from '@/views/homePage';
 
 /**
  * @description: 全局路由配置
@@ -28,15 +27,6 @@ const routes: RoutesTypeNew = [
         element: <PageLayout />,
         children: [
             {
-                path: "clientMain",
-                element: <ClientMain />,
-                meta: {
-                    title: "首页",
-                    // icon: <LineChartOutlined />,
-                    accessId: "dashboard",
-                },
-            },
-            {
                 path: "userHandle",
                 element: <UserHandle />,
                 meta: {
@@ -46,16 +36,16 @@ const routes: RoutesTypeNew = [
                 },
             },
             {
-                path: "fileList",
-                element: <FileList />,
+                path: "home",
+                element: <HomePage />,
                 meta: {
-                    title: "文件列表",
-                    // icon: <LineChartOutlined />,
-                    accessId: "fileList",
+                    title: "首页",
+                    noLogin: true,
+                    hideMenu: true,
                 },
             },
             {
-                path: "file/:filePath",
+                path: "/:projectKey",
                 element: <FileContent />,
                 meta: {
                     title: "文件内容",
@@ -63,38 +53,38 @@ const routes: RoutesTypeNew = [
                 },
             },
             {
-                path:"project/febao",
-                element: <FileList />,
-            }
-        ],
+                path: '/:projectKey/:file.Path',
+                element: <FileContent />,  // 用来展示文件内容
+            },
+],
     },
-    {
-        path: "/login",
+{
+    path: "/login",
         element: <Index />,
-        meta: {
-            title: "登录",
+            meta: {
+        title: "登录",
             noLogin: true,
-            hideMenu: true,
+                hideMenu: true,
         },
-    },
-    {
-        path: "/403",
+},
+{
+    path: "/403",
         element: <Page403 />,
-        meta: {
-            title: "403",
+            meta: {
+        title: "403",
             noLogin: true,
-            hideMenu: true,
+                hideMenu: true,
         },
-    },
-    {
-        path: "*",
+},
+{
+    path: "*",
         element: <Page404 />,
-        meta: {
-            title: "404",
+            meta: {
+        title: "404",
             noLogin: true,
-            hideMenu: true,
+                hideMenu: true,
         },
-    },
+},
 ];
 
 export { routes };

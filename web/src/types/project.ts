@@ -12,3 +12,18 @@ export interface projectList extends RspModel {
     data:projectItem[];
 }
 
+export interface fileKey {
+    name:string;
+    path:string;
+}
+export interface folderKey {
+    [folderName:string]:fileKey[];
+}
+
+export interface childProjectItem extends RspModel {
+    data:folderKey;
+}
+
+export interface fileContent extends RspModel {
+    data:{content:string}
+}

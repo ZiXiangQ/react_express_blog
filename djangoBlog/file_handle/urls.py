@@ -7,12 +7,12 @@ Description: description
 
 # file_handle/urls.py
 from django.urls import path
-from .views.views import FileList, FileContent
-from .views.project_handle import get_all_files
+from .views.file_read import FileContent
+from .views.project_handle import get_all_files, get_children_tree
 
 urlpatterns = [
-    path('files/', FileList.as_view(), name='file-list'),
-    path('files/<path:file_path>/', FileContent.as_view(), name='file-content'),
+    path('file_read', FileContent.as_view(), name='file-content'),
 
     path('project', get_all_files, name='project-list'),
+    path('project/get_children_tree', get_children_tree, name='get_children_tree')
 ]
