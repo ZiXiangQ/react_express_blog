@@ -22,6 +22,8 @@ interface File {
 }
 
 const LeftMenu:React.FC<LeftMenuProps> = ({ data, projectKey }) => {
+  // const navigate = useNavigate();
+
   useEffect(() => {
     console.log(data, projectKey);
   }, []);
@@ -44,14 +46,16 @@ const LeftMenu:React.FC<LeftMenuProps> = ({ data, projectKey }) => {
     });
   };
 
-  const get_data = (path: string) => {
-    console.log(path);
-    console.log(window.location.href)
-  };
+  // const get_data = (path: string) => {
+  //   console.log(path);
+  //   console.log(window.location.href)
+  //   console.log(`/${projectKey}/${encodeURIComponent(path)}`)
+  //   navigate(`/${projectKey}/${encodeURIComponent(path)}`);
+  // };
 
 return (
   <Sider width= { 200} className = "site-layout-background" >
-    <Menu mode="inline" onClick={(e) => {get_data(e.key)}} style = {{ height: '100%', borderRight: 0 }}>
+    <Menu mode="inline" style = {{ height: '100%', borderRight: 0 }}>
       { renderMenuItems(data) }
     </Menu>
   </Sider>

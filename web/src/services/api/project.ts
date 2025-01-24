@@ -18,6 +18,11 @@ class projectService {
     return HttpClient.post<fileContent,{file_path:string}>(api,param)
   }  
 
+  get_pdf_content(param: { file_path: string }) {
+    const api = '/file_handle/file_read';
+    return HttpClient.fetchPdf(api, param);  // 使用 fetchPdf 获取 PDF
+  }
+
 }
 const ProjectService = new projectService();
 export default ProjectService;

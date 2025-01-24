@@ -16,3 +16,71 @@ body {
 .ant-layout-content {
   background: #f0f2f5;
 }
+/* 容器样式 */
+.arrow-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f0f0;
+}
+
+
+
+/* 容器样式 */
+.arrow-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.arrow-body {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  /* 这里修改整个流动箭头的长度 */
+  width: 500px;
+  /* 这里修改body的高度，注意：会影响三角箭头的形状 */
+  height: 24px;
+  overflow: hidden;
+}
+
+
+/* 三角箭头 */
+.arrow-body::after {
+  content:"";
+  position:absolute;
+  /* 这里要和下面一起修改 */
+  right: -12px;
+  top: 0;
+  width: 0;
+  height: 0;
+  /* 这里修改箭头的高度，这里建议是上面的24px的一半，同时要修改right：-12px的值 */
+  border: 12px solid transparent;
+  /* 这里可以修改箭头的横向长度，以及颜色 */
+  border-left-width: 20px;
+  border-left-color: skyblue;
+} 
+/* 流动的线条的body */
+.flow-body {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: calc(100% - 10px);
+  overflow: hidden;
+}
+/* 线条样式 */
+.flow-body::before {
+  content:"";
+  position: absolute;
+  width: 200%;
+  /* 这里修改线条的高度，同时top减去的值是高度的一半（为了保持垂直居中） */
+  height: 6px;
+  top: calc(50% - 3px);
+  /* 这里修改线条的颜色（可以达到渐变） */
+  background: repeating-linear-gradient(90deg,skyblue 0,skyblue 15px,rgba(0,0,0,0) 15px,rgba(0,0,0,0) 20px);
+  transform: translateX(-100%);
+  animation: flow linear 8s infinite;
+}

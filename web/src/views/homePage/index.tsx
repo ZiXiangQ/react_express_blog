@@ -1,10 +1,43 @@
-import React from 'react';
+/*
+ * @Author: qiuzx
+ * @Date: 2025-01-08 10:50:55
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
+import React, { useEffect } from 'react';
 import { Typography, Button } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
+import './index.less';
+import LineChart from './test';
 
 const { Title, Paragraph } = Typography;
 
 const Home = () => {
+
+  useEffect(() => {
+    calcuFunc();
+    return () => {
+    };
+  }, []);
+
+  const calcuFunc = () => {
+    const elements = [[1, 3], [2, 6], [8, 10], [15, 18]];
+    elements.sort((p, q) => p[0] - q[0]); // 按照左端点从小到大排序
+    const ans = [];
+    for (const p of elements) {
+      console.log(p);
+      const m = ans.length;
+      console.log(m);
+      if (m && p[0] <= ans[m - 1][1]) { // 可以合并
+        ans[m - 1][1] = Math.max(ans[m - 1][1], p[1]); // 更新右端点最大值
+      } else { // 不相交，无法合并
+        ans.push(p); // 新的合并区间
+      }
+    }
+    console.log(ans);
+  };
+  
+
   return (
     <div style={{ textAlign: 'center', padding: '50px' }}>
       <Title level={2}>欢迎访问知识文档</Title>
@@ -14,6 +47,7 @@ const Home = () => {
       <Button type="primary" size="large" style={{ marginTop: '20px' }}>
         开始浏览 <RightOutlined />
       </Button>
+      <LineChart></LineChart>
     </div>
   );
 };

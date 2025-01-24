@@ -1,3 +1,9 @@
+/*
+ * @Author: qiuzx
+ * @Date: 2025-01-07 18:34:07
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
 import { RspModel } from "@/services/httpClient";
 
 export interface projectItem {
@@ -25,5 +31,10 @@ export interface childProjectItem extends RspModel {
 }
 
 export interface fileContent extends RspModel {
-    data:{content:string}
+    blob: fileContent;
+    data:
+    {
+        content:string,
+        type?:string
+    }
 }

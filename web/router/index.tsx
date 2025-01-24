@@ -1,3 +1,9 @@
+/*
+ * @Author: qiuzx
+ * @Date: 2024-12-19 15:02:42
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
 // src/router/index.tsx
 import Index from '@/views/login/index';
 import Page403 from '@/views/errorPage/page403';
@@ -20,7 +26,7 @@ import HomePage from '@/views/homePage';
 const routes: RoutesTypeNew = [
     {
         path: "/",
-        redirect: "/login",
+        element: "/login",
     },
     {
         path: "/",
@@ -45,17 +51,21 @@ const routes: RoutesTypeNew = [
                 },
             },
             {
-                path: "/:projectKey",
-                element: <FileContent />,
+                path: '/:projectKey/:filePath',
+                element: <FileContent />,  // 用来展示文件内容
                 meta: {
                     title: "文件内容",
                     hideMenu: true,
                 },
             },
             {
-                path: '/:projectKey/:file.Path',
-                element: <FileContent />,  // 用来展示文件内容
-            },
+                path: "/:projectKey",
+                element: <FileContent />,
+                meta: {
+                    title: "项目内容",
+                    hideMenu: true,
+                },
+            }
 ],
     },
 {

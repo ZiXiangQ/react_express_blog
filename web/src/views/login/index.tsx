@@ -14,10 +14,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const navigate = useNavigate()
-    
     const onFinish = (values: LoginValues) => {
         BasicService.login(values).then((res) => {
-            console.log(res);
             if(res.code == 0) {
                 message.success('登录成功');
                 navigate("/home")
@@ -42,7 +40,6 @@ const Login = () => {
                     >
                         <Input />
                     </Form.Item>
-
                     <Form.Item
                         name="password"
                         label="密码"
@@ -50,7 +47,6 @@ const Login = () => {
                     >
                         <Input.Password />
                     </Form.Item>
-
                     <Form.Item>
                         <Button type="primary" htmlType="submit" block>
                             登录

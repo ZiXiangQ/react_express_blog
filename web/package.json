@@ -14,12 +14,15 @@
     "@types/react-redux": "^7.1.25",
     "antd": "^5.22.5",
     "axios": "^1.7.9",
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
     "less": "^4.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.2.2",
     "react-router-waiter": "^1.1.7",
+    "reactflow": "^11.11.4",
     "ut-utils": "^0.0.4"
   },
   "devDependencies": {
