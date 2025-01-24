@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spin, Alert } from 'antd';
-import ProjectService from '@/services/api/project';
+import axios from 'axios';
+import './index.less';
 
 const FileContent: React.FC = () => {
     const { projectKey, filePath } = useParams<{ projectKey: string; filePath: string }>();
@@ -19,15 +20,23 @@ const FileContent: React.FC = () => {
         }
         const fetchFileContent = async () => {
             try {
-                const response = await ProjectService.get_file_content({ file_path: `${projectKey}/${filePath}` });
-                console.log('response:', response);
-                if (response && response.data) {
-                    setContent(response.data.content);
-                    if (typeof response.data.type === 'string') {
-                        setContentType(response.data.type);
-                    }
+                const requestData = {
+                    file_path: `${projectKey}/${filePath}`,
+                };
+
+                const response = await axios.post('http://127.0.0.1:11055/file_handle/file_read', requestData, {
+                    responseType: filePath.endsWith('.pdf') ? 'blob' : 'json', // 对 PDF 文件设置为二进制流
+                });
+                if (filePath.endsWith('.pdf')) {
+                    // 处理 PDF 文件，生成 Blob URL
+                    const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(pdfBlob);
+                    setPdfUrl(url);
                 } else {
-                    setError('Invalid response from server.');
+                    // 处理其他文件内容
+                    const { content, type } = response.data;
+                    setContent(content);
+                    setContentType(type || 'text');
                 }
             } catch (err) {
                 console.error('Error fetching file content:', err);
@@ -37,24 +46,7 @@ const FileContent: React.FC = () => {
             }
         };
 
-        const fetchPdf = async () => {
-            try {
-                const url = await ProjectService.get_pdf_content( { file_path: `${projectKey}/${filePath}` });
-                console.log('pdf url:', url);
-                setPdfUrl(url);
-            } catch (err) {
-                console.error("Error fetching PDF:", err);
-                setError("Failed to fetch PDF file.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (filePath.endsWith('.pdf')) {
-            fetchPdf();
-        } else {
-            fetchFileContent();
-        }
+        fetchFileContent();
     }, [projectKey, filePath]);
 
     if (loading) {
@@ -66,14 +58,25 @@ const FileContent: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className='file-content'>
             <h2>文件内容: {filePath}</h2>
-            {contentType === 'html' && <div dangerouslySetInnerHTML={{ __html: content }} />}
-            {contentType === 'text' && <pre style={{ whiteSpace: 'pre-wrap' }}>{content}</pre>}
+            {contentType === 'html' && (
+                    <div
+                        className='html-content'
+                        dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                )}
+                {contentType === 'text' && (
+                    <pre
+                        className='text-content'
+                    >
+                        {content}
+                    </pre>
+                )}
             {pdfUrl && (
                 <iframe
                     src={pdfUrl}
-                    style={{ width: '100%', height: '80vh', border: 'none' }}
+                    style={{ flex: 1, border: 'none', width: '100%', height: '100%' }}
                     title="PDF Viewer"
                 />
             )}

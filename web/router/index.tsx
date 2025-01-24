@@ -23,6 +23,8 @@ import HomePage from '@/views/homePage';
  * @param {boolean} noLogin // 路由页面是否需要登录访问
  * @param {boolean} hideMenu // 是否在侧边栏中隐藏该路由菜单
  */
+
+
 const routes: RoutesTypeNew = [
     {
         path: "/",
@@ -52,7 +54,7 @@ const routes: RoutesTypeNew = [
             },
             {
                 path: '/:projectKey/:filePath',
-                element: <FileContent />,  // 用来展示文件内容
+                element: <FileContent />,  // 使用key属性，解决刷新页面后，文件内容不更新的问题
                 meta: {
                     title: "文件内容",
                     hideMenu: true,

@@ -45,12 +45,12 @@ def read_file_content(file_path, file_type):
             return {'content': content, 'type': 'text'}
 
         elif file_type == 'pdf':
-            # 返回 PDF 文件流
             try:
                 with open(file_path, 'rb') as f:
                     pdf_content = f.read()  # 读取 PDF 文件的二进制内容
                 response = HttpResponse(pdf_content, content_type='application/pdf')  # 设置为 PDF 类型
                 response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"; filename*=UTF-8\'\'{quote(os.path.basename(file_path))}'
+                print(response,'dafd')
                 return response
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=500)

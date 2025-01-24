@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
 import { Dropdown, Layout, Menu, message } from 'antd';
-import { Outlet, useNavigate } from 'react-router-dom'; // 导入 Outlet
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'; // 导入 Outlet
 import ProjectService from '@/services/api/project';
 import { childProjectItem, folderKey, projectItem, projectList } from '@/types/project';
 import LeftMenu from './component/leftMenu';
@@ -11,13 +11,13 @@ import './index.less';
 const PageLayout: React.FC = () => {
   const { Header, Content, Footer } = Layout;
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
   const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
   const [leftMenuData, setLeftMenuData] = useState<folderKey>();
   const [currentKey, setCurrentKey] = useState<string>('home'); // 当前选中的导航项
-
   const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
 
@@ -126,9 +126,9 @@ const PageLayout: React.FC = () => {
         {currentKey !== 'home' && leftMenuData && (
           <LeftMenu data={leftMenuData} projectKey={projectKey.current} />
         )}        
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Content className="content" style={{ padding: '24px', marginTop: '10px' }}>
-            <Outlet /> {/* 渲染子路由的内容 */}
+        <Layout>
+          <Content className="content" style={{ padding: '12px', marginTop: '10px' }}>
+            <Outlet key={location.pathname}/> {/* 渲染子路由的内容 key用来解决刷新页面后，子路由内容不更新的问题 */}
           </Content>
         </Layout>
       </Layout>
