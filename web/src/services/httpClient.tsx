@@ -25,7 +25,7 @@ class HttpClient {
     private async handleJsonResponse<T extends RspModel>(promise: Promise<AxiosResponse<T>>): Promise<T> {
         try {
             const rsp = await promise;
-            if (rsp.data && rsp.data.code !== "0") {
+            if (rsp.data && rsp.data.code !== 0) {
                 message.error(rsp.data.message);
                 throw new Error(rsp.data.message); // 抛出错误以便外部捕获
             }
@@ -78,18 +78,10 @@ class HttpClient {
             responseType: "arraybuffer" as const, // Set response type to binary
         };
         try {
-            // Choose between GET or POST based on whether a body is provided
             const response = body
                 ? await axios.post(api, body, config)
                 : await axios.get(api, config);
-
-            // Log the response for debugging purposes
-            console.log("PDF Response:", response);
-
-            // Create a Blob from the binary data
             const blob = new Blob([response.data], { type: "application/pdf" });
-
-            // Generate a Blob URL and return it
             return URL.createObjectURL(blob);
         } catch (error) {
             console.error("PDF Fetch Error:", error);

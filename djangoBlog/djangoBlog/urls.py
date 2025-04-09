@@ -2,7 +2,7 @@
 Author: qiuzx
 Date: 2024-12-23 14:56:54
 LastEditors: qiuzx
-Description: description
+Description: api 路由
 '''
 from django.contrib import admin
 from django.urls import path, include

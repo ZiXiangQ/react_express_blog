@@ -4,13 +4,13 @@
  * @LastEditors: qiuzx
  * @Description: description
  */
-// src/router/index.tsx
 import Index from '@/views/login/index';
 import Page403 from '@/views/errorPage/page403';
 import Page404 from '@/views/errorPage/page404';
 import PageLayout from '@/views/PageLayout';
 import UserHandle from '@/views/userHandle';
 import FileContent from '@/views/fileContent';
+import Setting from '@/views/setting';
 import { RoutesTypeNew } from '@/types/routes';
 import HomePage from '@/views/homePage';
 
@@ -28,7 +28,7 @@ import HomePage from '@/views/homePage';
 const routes: RoutesTypeNew = [
     {
         path: "/",
-        element: "/login",
+        redirect: "/login",
     },
     {
         path: "/",
@@ -41,6 +41,15 @@ const routes: RoutesTypeNew = [
                     title: "用户管理",
                     // icon: <LineChartOutlined />,
                     accessId: "userHandle",
+                },
+            },
+            {
+                path: "/setting",
+                element: <Setting />,
+                meta: {
+                    title: "设置",
+                    noLogin: true,
+                    hideMenu: true,
                 },
             },
             {
@@ -68,35 +77,35 @@ const routes: RoutesTypeNew = [
                     hideMenu: true,
                 },
             }
-],
+        ],
     },
-{
-    path: "/login",
+    {
+        path: "/login",
         element: <Index />,
-            meta: {
-        title: "登录",
+        meta: {
+            title: "登录",
             noLogin: true,
-                hideMenu: true,
+            hideMenu: true,
         },
-},
-{
-    path: "/403",
+    },
+    {
+        path: "/403",
         element: <Page403 />,
-            meta: {
-        title: "403",
+        meta: {
+            title: "403",
             noLogin: true,
-                hideMenu: true,
+            hideMenu: true,
         },
-},
-{
-    path: "*",
+    },
+    {
+        path: "*",
         element: <Page404 />,
-            meta: {
-        title: "404",
+        meta: {
+            title: "404",
             noLogin: true,
-                hideMenu: true,
+            hideMenu: true,
         },
-},
+    },
 ];
 
 export { routes };

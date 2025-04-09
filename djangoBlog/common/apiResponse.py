@@ -2,15 +2,17 @@
 Author: qiuzx
 Date: 2025-01-07 18:23:52
 LastEditors: qiuzx
-Description: description
+Description: api_response
 '''
 from rest_framework.response import Response
 
+
+
 class ApiResponse:
     @staticmethod
-    def success(message, data=None):
+    def success(message,data=None):
         return Response({
-            'code': '0',
+            'code': 0,
             'message': message,
             'data': data or {}
         })
@@ -18,9 +20,9 @@ class ApiResponse:
     @staticmethod
     def error(message, data=None):
         return Response({
-            'code': 'error',
+            'code': -1,
             'message': message,
-            'data': data or {}
+            'data':data or {}
         })
 
     @staticmethod

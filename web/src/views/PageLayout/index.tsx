@@ -43,7 +43,7 @@ const PageLayout: React.FC = () => {
     ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
       if (rsp.code == 0) {
         setLeftMenuData(rsp.data);
-      }else {
+      } else {
         message.error(rsp.message);
       }
     })
@@ -75,6 +75,11 @@ const PageLayout: React.FC = () => {
     navigate('/userHandle');
   };
 
+  // 系统设置页面
+  const handleSetting = () => {
+    navigate('/setting');
+  };
+
   useEffect(() => {
     if (!loading && projectsList.length > 0) {
       const projectItems: MenuItem[] = !loading && projectsList.length > 0
@@ -95,7 +100,10 @@ const PageLayout: React.FC = () => {
       <Menu.Item key="1" onClick={handleUserManagement}>
         用户管理
       </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
+      <Menu.Item key="2" onClick={handleSetting}>
+        系统设置
+      </Menu.Item>
+      <Menu.Item key="3" onClick={handleLogout}>
         登出
       </Menu.Item>
     </Menu>
@@ -106,7 +114,7 @@ const PageLayout: React.FC = () => {
 
       <Header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="demo-logo" />
-        <span className="title">Ant Design Pro</span>
+        <span className="title">知识库</span>
         {/* 动态生成顶部导航栏 */}
         <Menu
           mode="horizontal"
@@ -125,10 +133,10 @@ const PageLayout: React.FC = () => {
       <Layout className="main-layout">
         {currentKey !== 'home' && leftMenuData && (
           <LeftMenu data={leftMenuData} projectKey={projectKey.current} />
-        )}        
+        )}
         <Layout>
           <Content className="content" style={{ padding: '12px', marginTop: '10px' }}>
-            <Outlet key={location.pathname}/> {/* 渲染子路由的内容 key用来解决刷新页面后，子路由内容不更新的问题 */}
+            <Outlet key={location.pathname} /> {/* 渲染子路由的内容 key用来解决刷新页面后，子路由内容不更新的问题 */}
           </Content>
         </Layout>
       </Layout>

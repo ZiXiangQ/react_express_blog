@@ -19,6 +19,7 @@
     "less": "^4.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-flow-renderer": "^10.3.17",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.2.2",
     "react-router-waiter": "^1.1.7",

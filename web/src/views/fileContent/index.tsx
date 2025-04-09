@@ -23,7 +23,6 @@ const FileContent: React.FC = () => {
                 const requestData = {
                     file_path: `${projectKey}/${filePath}`,
                 };
-
                 const response = await axios.post('http://127.0.0.1:11055/file_handle/file_read', requestData, {
                     responseType: filePath.endsWith('.pdf') ? 'blob' : 'json', // 对 PDF 文件设置为二进制流
                 });
@@ -59,7 +58,6 @@ const FileContent: React.FC = () => {
 
     return (
         <div className='file-content'>
-            <h2>文件内容: {filePath}</h2>
             {contentType === 'html' && (
                     <div
                         className='html-content'

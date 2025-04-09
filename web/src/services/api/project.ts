@@ -1,10 +1,16 @@
+/*
+ * @Author: qiuzx
+ * @Date: 2025-01-07 17:30:55
+ * @LastEditors: qiuzx
+ * @Description: description
+ */
 import HttpClient from "@/services/httpClient";
 import { childProjectItem, fileContent, projectList } from "@/types/project";
 
 class projectService {
 
   get_all_projects() {  //获取所有项目
-    const api = '/file_handle/project';
+    const api = '/file_handle/project/topname';
     return HttpClient.get<projectList>(api)
   }
 

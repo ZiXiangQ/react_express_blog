@@ -1,0 +1,22 @@
+.dynamic-edge {
+  fill: none;
+  stroke: #3498db;
+  stroke-width: 2px;
+  stroke-dasharray: 8 4; /* 虚线间隔 */
+  animation: dashAnimation 1.5s linear infinite; /* 动画效果 */
+  
+}
+
+@keyframes dashAnimation {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -20; /* 控制动态流动方向 */
+  }
+}
+
+/* 可选：交互区域样式 */
+.interactive-path {
+  cursor: pointer;
+}

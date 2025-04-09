@@ -7,14 +7,16 @@
 import { RspModel } from "@/services/httpClient";
 
 export interface projectItem {
-    id?:number;
+    id:number;
     project_name?:string;
     project_key?:string;
     visible_users?:string;
     type?:string;
+    isEditing?:boolean;
 }
 
 export interface projectList extends RspModel {
+    map(arg0: (item: projectItem) => { isEditing: boolean; id?: number; project_name?: string; project_key?: string; visible_users?: string; type?: string; }): unknown;
     data:projectItem[];
 }
 

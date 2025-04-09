@@ -8,7 +8,7 @@ import React, { useEffect } from 'react';
 import { Typography, Button } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import './index.less';
-import LineChart from './test';
+// import FlowDiagram from './systemNetMap';
 
 const { Title, Paragraph } = Typography;
 
@@ -25,9 +25,7 @@ const Home = () => {
     elements.sort((p, q) => p[0] - q[0]); // 按照左端点从小到大排序
     const ans = [];
     for (const p of elements) {
-      console.log(p);
       const m = ans.length;
-      console.log(m);
       if (m && p[0] <= ans[m - 1][1]) { // 可以合并
         ans[m - 1][1] = Math.max(ans[m - 1][1], p[1]); // 更新右端点最大值
       } else { // 不相交，无法合并
@@ -47,7 +45,7 @@ const Home = () => {
       <Button type="primary" size="large" style={{ marginTop: '20px' }}>
         开始浏览 <RightOutlined />
       </Button>
-      <LineChart></LineChart>
+      {/* <FlowDiagram></FlowDiagram> */}
     </div>
   );
 };
