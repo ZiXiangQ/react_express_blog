@@ -84,3 +84,26 @@ body {
   transform: translateX(-100%);
   animation: flow linear 8s infinite;
 }
+
+.home-container {
+  text-align: center;
+  padding: 50px;
+
+  &.light {
+    background-color: #fff;
+    color: rgba(0, 0, 0, 0.85);
+
+    .ant-typography {
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  &.dark {
+    background-color: #141414;
+    color: rgba(255, 255, 255, 0.85);
+
+    .ant-typography {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+}

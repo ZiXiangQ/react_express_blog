@@ -7,12 +7,13 @@
 import React, { useEffect } from 'react';
 import { Typography, Button } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
+import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
-// import FlowDiagram from './systemNetMap';
 
 const { Title, Paragraph } = Typography;
 
 const Home = () => {
+  const { theme } = useTheme();
 
   useEffect(() => {
     calcuFunc();
@@ -37,7 +38,7 @@ const Home = () => {
   
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
+    <div className={`home-container ${theme}`}>
       <Title level={2}>欢迎访问知识文档</Title>
       <Paragraph style={{ fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>
         这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。

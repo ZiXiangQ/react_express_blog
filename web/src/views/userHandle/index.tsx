@@ -4,6 +4,8 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import UserService from '@/services/api/user';
 import { userParam } from '@/types/user';
 import UserEdit from './components/userEdit';
+import { useTheme } from '@/contexts/ThemeContext';
+import './index.less';
 
 interface User {
   id: number;
@@ -14,10 +16,12 @@ interface User {
 }
 
 const UserManagement: React.FC = () => {
+  const { theme } = useTheme();
   const [users, setUsers] = useState<userParam[]>([]);
   const [newUser, setNewUser] = useState<userParam>({ id: 0, username: '', email: '', password: '', is_active: true });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('添加用户');
+  
   useEffect(() => {
     getUserInfo();
     return () => {
@@ -27,16 +31,15 @@ const UserManagement: React.FC = () => {
   const getUserInfo = () => {
     UserService.get_user_list().then(res => {
       setUsers(res.data)
-    }) // TO: 获取用户信息
+    })
   };
-
 
   const deleteUser = (id: number) => {
     console.log(id)
     UserService.delete_user({ id }).then((res) => {
       console.log(res)
       getUserInfo();
-    }) // TO: 删除用户信息
+    })
   };
 
   const showModal = (type: 'add' | 'edit' | 'password', user?: User) => {
@@ -81,8 +84,7 @@ const UserManagement: React.FC = () => {
       title: '状态',
       dataIndex: 'is_active',
       key: 'is_active',
-      render: (is_active:
-        boolean) => <Tag color={is_active === true ? 'green' : 'volcano'}>{is_active === true ? '活跃' : '冻结'}</Tag>
+      render: (is_active: boolean) => <Tag color={is_active === true ? 'green' : 'volcano'}>{is_active === true ? '活跃' : '冻结'}</Tag>
     },
     {
       title: '操作',
@@ -98,8 +100,8 @@ const UserManagement: React.FC = () => {
             cancelText="取消"
             title="确认删除？"
             onConfirm={() => deleteUser(user.id)}>
-            <Button type="link">
-              <DeleteOutlined />删除用户
+            <Button type="link" danger>
+              <DeleteOutlined />删除
             </Button>
           </Popconfirm>
         </Space>
@@ -108,14 +110,14 @@ const UserManagement: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: "space-between", alignContent: "center", alignItems: "center" }}>
-        <h2>用户信息</h2>
-        <Button type="primary" onClick={() => showModal('add')} icon={<PlusOutlined />}>
-          添加新用户
+    <div className={`user-management ${theme}`}>
+      <div className="header">
+        <h2>用户管理</h2>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal('add')}>
+          添加用户
         </Button>
       </div>
-      <Table dataSource={users} columns={columns} rowKey="id" />
+      <Table columns={columns} dataSource={users} rowKey="id" />
       <UserEdit
         isModalVisible={isModalVisible}
         user={newUser}

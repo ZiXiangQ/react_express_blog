@@ -4,7 +4,7 @@
  * @LastEditors: qiuzx
  * @Description: description
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Layout, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { folderKey } from '@/types/project';

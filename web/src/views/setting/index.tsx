@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Layout,
-  Radio,
   Input,
   Button,
   message,
@@ -9,21 +7,21 @@ import {
   Popconfirm,
   Space,
   Divider,
+  Switch,
 } from 'antd';
 import ProjectService from '@/services/api/project';
 import { projectItem } from '@/types/project';
-import HttpClient from '@/services/httpClient';
-import { RspModel } from '@/services/httpClient';
-
-const { Content } = Layout;
+import '@/styles/theme.css';
+import { useTheme } from '@/contexts/ThemeContext';
 
 
 function SettingsPage() {
-  const [theme, setTheme] = useState('light'); // 主题
+  const { theme, setTheme } = useTheme();
   const [filePath, setFilePath] = useState(''); // 文件路径
   const [tempPath, setTempPath] = useState(''); // 临时文件路径
   const [isEditingPath, setIsEditingPath] = useState(false); // 是否编辑文件路径
   const [projects, setProjects] = useState<projectItem[]>([]); // 项目列表
+  const [originalProjects, setOriginalProjects] = useState<projectItem[]>([]); // 保存原始项目数据，用于取消编辑
 
   useEffect(() => {
     getProjectList();
@@ -31,11 +29,10 @@ function SettingsPage() {
 
   const getProjectList = () => {
     ProjectService.get_all_projects().then((res) => {
-      console.log(res)
       if (res.code == 0) {
         const withEditState: projectItem[] = res.data.map((item: projectItem) => ({ ...item, isEditing: false }));
-        console.log(withEditState)
         setProjects(withEditState);
+        setOriginalProjects(withEditState); // 保存原始数据
       }
     })
   }
@@ -63,68 +60,84 @@ function SettingsPage() {
   };
 
   const handleChange = (value: string, key: string, id: number) => {
-    console.log(value, key, id);
-    
-    // 使用map更新projects数组，找到id匹配的项目并更新其属性
     const updatedProjects = projects.map((project) => {
       if (project.id === id) {
         return { ...project, [key]: value };
       }
       return project;
     });
-    
     setProjects(updatedProjects);
   };
 
   const handleSave = (id: number) => {
-    // 找到当前编辑的项目
     const projectToSave = projects.find(project => project.id === id);
-    
     if (projectToSave) {
-      // 调用编辑接口 - 使用POST方法发送项目数据
-      const api = '/file_handle/project/update';
-      HttpClient.post<RspModel, projectItem>(api, projectToSave)
-        .then((res: RspModel) => {
+      // 判断是新增还是更新
+      // 检查项目是否存在于原始数据中
+      const isNewProject = !originalProjects.some(p => p.id === id);
+      if (isNewProject) {
+        // 新增项目
+        ProjectService.add_project(projectToSave).then((res) => {
           if (res.code === 0) {
-            message.success('保存成功');
-            // 更新编辑状态
+            message.success(res.message || '添加成功');
             toggleEdit(id, false);
+            getProjectList(); // 重新获取项目列表，以获取服务器返回的ID
           } else {
-            message.error('保存失败');
+            message.error(res.message || '添加失败');
           }
-        })
-        .catch((err: Error) => {
-          message.error('保存失败');
+        }).catch(err => {
           console.error(err);
+          message.error('添加失败');
         });
+      } else {
+        // 更新项目
+        ProjectService.update_project(projectToSave).then((res) => {
+          if (res.code === 0) {
+            message.success(res.message || '更新成功');
+            toggleEdit(id, false);
+            getProjectList(); // 重新获取项目列表
+          } else {
+            message.error(res.message || '更新失败');
+          }
+        }).catch(err => {
+          console.error(err);
+          message.error('更新失败');
+        });
+      }
     }
   };
 
   const handleDelete = (id: number) => {
-    // 调用删除接口 - 使用POST方法发送项目ID
-    const api = '/file_handle/project/delete';
-    HttpClient.post<RspModel, { id: number }>(api, { id })
-      .then((res: RspModel) => {
-        if (res.code === 0) {
-          message.success('删除成功');
-          // 更新本地状态
-          setProjects(projects.filter((project) => project.id !== id));
-        } else {
-          message.error('删除失败');
-        }
-      })
-      .catch((err: Error) => {
-        message.error('删除失败');
-        console.error(err);
-      });
+    ProjectService.delete_project(id).then((res) => {
+      if (res.code === 0) {
+        message.success(res.message);
+        getProjectList();
+      }
+    });
   };
 
   const toggleEdit = (id: number, edit: boolean) => {
     const updated = projects.map((project) =>
       project.id === id ? { ...project, isEditing: edit } : project
     );
-    
+
     setProjects(updated);
+  };
+
+  const cancelEdit = (id: number) => {
+    // 从原始数据中找到对应的项目
+    const originalProject = originalProjects.find(p => p.id === id);
+    if (originalProject) {
+      // 更新项目列表，恢复原始数据
+      const updated = projects.map((project) =>
+        project.id === id ? { ...originalProject, isEditing: false } : project
+      );
+      setProjects(updated);
+    }
+  };
+
+  const handleThemeChange = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light');
   };
 
   const columns = [
@@ -182,17 +195,25 @@ function SettingsPage() {
     {
       title: '操作',
       dataIndex: 'action',
-      width: 160,
+      width: 200, // 增加操作列的宽度，以适应两个按钮
       render: (_: string, record: projectItem) => (
-        <Space>
+        <Space size="small">
           {record.isEditing ? (
-            <Button
-              type="primary"
-              size="small"
-              onClick={() => handleSave(record.id)}
-            >
-              保存
-            </Button>
+            <>
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleSave(record.id)}
+              >
+                保存
+              </Button>
+              <Button
+                size="small"
+                onClick={() => cancelEdit(record.id)}
+              >
+                取消
+              </Button>
+            </>
           ) : (
             <Button
               size="small"
@@ -214,24 +235,29 @@ function SettingsPage() {
     },
   ];
 
-
   return (
-    <Content style={{ margin:"0 10", minHeight: 280 }}>
-      {/* 主题配置 */}
-      <section>
-        <h2>主题配置</h2>
-        <Radio.Group
-          value={theme}
-          onChange={(e) => setTheme(e.target.value)}
-        >
-          <Radio value="light">浅色模式</Radio>
-          <Radio value="dark">深色模式</Radio>
-        </Radio.Group>
-      </section>
-      <Divider></Divider>
+    <div style={{padding: 24, backgroundColor: theme === 'dark' ? '#181818' : '#fff' }}>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h3 style={{ margin: 0 }}>深色模式</h3>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--text-color)' }}>
+              {theme === 'dark' ? '当前使用深色主题' : '当前使用浅色主题'}
+            </p>
+          </div>
+          <Switch
+            checked={theme === 'dark'}
+            onChange={handleThemeChange}
+            checkedChildren="深色"
+            unCheckedChildren="浅色"
+          />
+        </div>
+      </div>
+      <Divider />
       {/* 文件路径配置 */}
-      <section style={{ marginTop: 24 }}>
-        <h2>文件路径配置</h2>
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ margin: 0 }}>文件路径</h3>
+        <p style={{ margin: '5px 0 12px 0', color: 'var(--text-color)' }}>配置系统文件路径</p>
         {isEditingPath ? (
           <>
             <Input
@@ -261,11 +287,14 @@ function SettingsPage() {
             <Button onClick={handleEditPath}>编辑</Button>
           </>
         )}
-      </section>
-      <Divider></Divider>
-      <section>
+      </div>
+
+      <Divider />
+
+      {/* 项目列表 */}
+      <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h2 style={{ margin: 0 }}>项目配置</h2>
+          <h3 style={{ margin: 0 }}>项目列表</h3>
           <Button type="primary" onClick={handleAddProject}>
             添加项目
           </Button>
@@ -275,10 +304,12 @@ function SettingsPage() {
           columns={columns}
           dataSource={projects}
           pagination={false}
+          bordered
+          size="middle"
         />
-      </section>
-    </Content>
-  );
+      </div>
+    </div>
+  )
 }
 
 export default SettingsPage;

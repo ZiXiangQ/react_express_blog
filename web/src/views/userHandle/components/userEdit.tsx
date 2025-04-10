@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { Form } from 'antd'
 import { userParam } from '@/types/user'
 import UserService from '@/services/api/user'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface IProps {
   isModalVisible: boolean
@@ -21,6 +22,7 @@ const UserEdit = (props: IProps) => {
   const [form] = Form.useForm()
   const { isModalVisible, user, handlecancel, modalTitle } = props
   const [value, setValue] = useState(1);
+  const { theme } = useTheme();
 
   useEffect(() => {
     console.log(user) 
@@ -93,7 +95,7 @@ const UserEdit = (props: IProps) => {
             确定
           </Button>,
         ]}
-        style={{ padding: 20 }}
+        className={`user-edit-modal ${theme}`}
       >
         <Form {...layout} form={form} name="userEdit">
           <Form.Item hidden={modalTitle === '修改密码'? true : false} label="姓名" name="username" rules={[{ required: true, message: '请输入姓名!' }]}>

@@ -6,12 +6,14 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'; // 导入 O
 import ProjectService from '@/services/api/project';
 import { childProjectItem, folderKey, projectItem, projectList } from '@/types/project';
 import LeftMenu from './component/leftMenu';
+import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 
 const PageLayout: React.FC = () => {
-  const { Header, Content, Footer } = Layout;
+  const { Header, Content } = Layout;
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
@@ -110,22 +112,25 @@ const PageLayout: React.FC = () => {
   );
 
   return (
-    <Layout className="layout">
-
-      <Header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div className="demo-logo" />
-        <span className="title">知识库</span>
-        {/* 动态生成顶部导航栏 */}
+    <Layout className={`layout ${theme}`}>
+      <Header className="header">
+        <div className="header-left">
+          <div className="demo-logo" />
+          <span className="title">知识库</span>
+        </div>
         <Menu
+          theme={theme}
           mode="horizontal"
-          onClick={handleMenuClick}
+          selectedKeys={[currentKey]}
           items={projectItems}
+          onClick={handleMenuClick}
+          style={{width: '80%'}}
         />
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-          <Dropdown overlay={menu}>
-            <div className="hoverable" style={{ cursor: 'pointer', padding: '10px 0 0 10px' }}>
-              <UserOutlined style={{ fontSize: '20px', margin: '0 10px', color: '#000' }} />
-              <span style={{ margin: '0 10px 0 0' }}>{username || "游客"}</span>
+        <div className="header-right">
+          <Dropdown overlay={menu} placement="bottomRight">
+            <div className="user-info-trigger hoverable">
+              <UserOutlined className="user-icon" />
+              <span className="user-name">{username || "游客"}</span>
             </div>
           </Dropdown>
         </div>
@@ -135,14 +140,11 @@ const PageLayout: React.FC = () => {
           <LeftMenu data={leftMenuData} projectKey={projectKey.current} />
         )}
         <Layout>
-          <Content className="content" style={{ padding: '12px', marginTop: '10px' }}>
-            <Outlet key={location.pathname} /> {/* 渲染子路由的内容 key用来解决刷新页面后，子路由内容不更新的问题 */}
+          <Content className="content">
+            <Outlet key={location.pathname} />
           </Content>
         </Layout>
       </Layout>
-      <Footer className="footer">
-        Ant Design ©{new Date().getFullYear()} Created by PkaQ
-      </Footer>
     </Layout>
   );
 };
