@@ -7,8 +7,8 @@ Description: description
 # file_handle/services.py
 
 import os
-from file_handle.models import Project
-from file_handle.serializers import ProjectSerializer
+from file_handle.models import Project, SystemSetting
+from file_handle.serializers import ProjectSerializer, SystemSettingSerializer
 from rest_framework.exceptions import APIException
 
 class ProjectService:
@@ -47,6 +47,26 @@ class ProjectService:
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
         return serializer.data
+    
+    @staticmethod
+    def get_system_path():
+        sysSetting = SystemSetting.objects.first()
+        serializer = SystemSettingSerializer(sysSetting)
+        return serializer.data
+    
+    @staticmethod
+    def modify_system_path(data):
+        try:
+            # 假设每个项目只有一个系统配置路径
+            sysSetting = SystemSetting.objects.all().first()
+            if not sysSetting:
+                return False, "系统配置不存在"
+            # 更新系统配置路径
+            sysSetting.system_config_path = data.get('system_config_path', sysSetting.system_config_path)
+            sysSetting.save()
+            return True, "系统配置路径更新成功"
+        except Exception as e:
+            return False, str(e)
 
     @staticmethod
     def get_children_tree(project_key):

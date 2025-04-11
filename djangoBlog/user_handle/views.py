@@ -30,7 +30,7 @@ def login(request):##登录
         user = User.objects.get(username=username)
         if user.password == md5_hash(password):
             token = generate_token()
-            response = Response({'code': '0', 'message': '登录成功'})
+            response = Response({'code': 0, 'message': '登录成功'})
             response['sid'] = f'{token}'  # 在 header 中添加 token
             return response
         else:
