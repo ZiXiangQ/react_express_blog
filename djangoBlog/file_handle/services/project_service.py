@@ -10,6 +10,7 @@ import os
 from file_handle.models import Project, SystemSetting
 from file_handle.serializers import ProjectSerializer, SystemSettingSerializer
 from rest_framework.exceptions import APIException
+from pathlib import Path
 
 class ProjectService:
     @staticmethod
@@ -52,39 +53,54 @@ class ProjectService:
     def get_system_path():
         sysSetting = SystemSetting.objects.first()
         serializer = SystemSettingSerializer(sysSetting)
-        return serializer.data
+        return serializer.data["system_config_path"]
     
     @staticmethod
     def modify_system_path(data):
         try:
-            # 假设每个项目只有一个系统配置路径
             sysSetting = SystemSetting.objects.all().first()
             if not sysSetting:
                 return False, "系统配置不存在"
             # 更新系统配置路径
             sysSetting.system_config_path = data.get('system_config_path', sysSetting.system_config_path)
             sysSetting.save()
-            return True, "系统配置路径更新成功"
+            return 0, "success", "系统配置路径更新成功"
         except Exception as e:
-            return False, str(e)
+            return -1, "error",str(e)
 
     @staticmethod
-    def get_children_tree(project_key):
-        # 定义根目录
-        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../../data', project_key)
-        file_data = {}
-        if not os.path.exists(data_path):
-            raise APIException('项目不存在')
-        
-        for subdir, dirs, files in os.walk(data_path):
-            folder_name = os.path.basename(subdir)
-            # 如果文件夹名不在数据中，初始化该键
-            if folder_name not in file_data:
-                file_data[folder_name] = []
-            for file in files:
-                file_path = os.path.relpath(os.path.join(subdir, file), start=data_path)
-                file_data[folder_name].append({
-                    'name': file.split('.')[0].strip(),
-                    'path': file_path,
-                })
+    def get_children_tree(path):
+        """
+        遍历给定路径下的文件夹和文件，返回一个层级递进的字典结构。
+        :param path: 需要遍历的根目录路径
+        :return: 返回一个递进的字典，包含文件和文件夹的树形结构
+        """
+        root_path = SystemSetting.objects.first().system_config_path
+        project_path = os.path.join(root_path, path)  # 确保路径是绝对路径
+        if not os.path.exists(project_path):
+            raise APIException('路径不存在')
+        def traverse_directory(current_path):
+            """
+            遍历当前目录及其子目录，构建文件夹与文件的层级关系。
+            """
+            result = []
+            # 遍历当前目录中的所有文件和子目录
+            for entry in os.scandir(current_path):
+                entry_path = Path(entry.path).resolve()  # 获取绝对路径
+                if entry.is_dir():  # 如果是子文件夹，递归遍历
+                    folder_data = {
+                        'name': entry.name,
+                        'path': str(entry_path),
+                        'type': 'folder',
+                        'children': traverse_directory(entry.path)  # 递归处理子文件夹
+                    }
+                    result.append(folder_data)
+                elif entry.is_file():  # 如果是文件，添加文件名和相对路径
+                    result.append({
+                        'name': entry.name,
+                        'path': str(entry_path),
+                        'type': entry.name.split('.')[-1].lower(),
+                    })
+            return result
+        file_data = traverse_directory(project_path)
         return file_data

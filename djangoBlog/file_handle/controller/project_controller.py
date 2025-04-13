@@ -9,7 +9,7 @@ Description: description
 import os
 from rest_framework.decorators import api_view
 from common.apiResponse import ApiResponse
-from file_handle.services.project_handle_service import ProjectService
+from file_handle.services.project_service import ProjectService
 
 @api_view(['POST'])
 def add_project(request):
@@ -40,27 +40,23 @@ def delete_project(request):
         return ApiResponse.success(message)
     return ApiResponse.error(message)
 
-@api_view(['GET','POST'])
+@api_view(['POST'])
 def get_all_projects(request):
     project_data = ProjectService.get_all_projects()
     return ApiResponse.success("success", project_data)
 
-@api_view(['GET'])
+@api_view(['POST'])
 def get_system_path(request):
     sys_path = ProjectService.get_system_path()
     return ApiResponse.success("success", sys_path)
 
 @api_view(['POST'])
 def modify_system_path(request):
-    sys_id = request.data.get('id')
-    if not sys_id:
-        return ApiResponse.error("缺少系统ID")
-    sys_path = ProjectService.modify_system_path(request.data)
-    if sys_path:
-        return ApiResponse.error("更新失败", sys_path)
+    code, message, sys_path = ProjectService.modify_system_path(request.data)
+    return ApiResponse.custom(code, message, sys_path)
 
 @api_view(['POST'])
 def get_children_tree(request):
     project_key = request.data.get('project_key')
     file_data = ProjectService.get_children_tree(project_key)
-    return ApiResponse.success(file_data)
+    return ApiResponse.success('success', file_data)
