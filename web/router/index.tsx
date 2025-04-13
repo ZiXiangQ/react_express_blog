@@ -18,7 +18,6 @@ import HomePage from '@/views/homePage';
  * @description: 全局路由配置
  * meta字段说明：↓↓↓
  * @param {string} title // 路由页面标题，以及侧边栏菜单中的标题
- * @param {element} icon // 侧边栏该路由菜单显示的图标
  * @param {string} accessId // 路由页面权限id
  * @param {boolean} noLogin // 路由页面是否需要登录访问
  * @param {boolean} hideMenu // 是否在侧边栏中隐藏该路由菜单
@@ -62,8 +61,8 @@ const routes: RoutesTypeNew = [
                 },
             },
             {
-                path: '/:projectKey/:filePath',
-                element: <FileContent />,  // 使用key属性，解决刷新页面后，文件内容不更新的问题
+                path: "/:projectKey/file",
+                element: <FileContent />,
                 meta: {
                     title: "文件内容",
                     hideMenu: true,

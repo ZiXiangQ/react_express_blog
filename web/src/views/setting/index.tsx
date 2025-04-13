@@ -18,13 +18,13 @@ import { useTheme } from '@/contexts/ThemeContext';
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [filePath, setFilePath] = useState(''); // 文件路径
-  const [tempPath, setTempPath] = useState(''); // 临时文件路径
   const [isEditingPath, setIsEditingPath] = useState(false); // 是否编辑文件路径
   const [projects, setProjects] = useState<projectItem[]>([]); // 项目列表
   const [originalProjects, setOriginalProjects] = useState<projectItem[]>([]); // 保存原始项目数据，用于取消编辑
 
   useEffect(() => {
     getProjectList();
+    getProjectPath();
   }, []);
 
   const getProjectList = () => {
@@ -37,14 +37,26 @@ function SettingsPage() {
     })
   }
 
+  const getProjectPath = () => {
+    ProjectService.get_system_path().then((res) => {
+      if (res.code == 0) {
+        setFilePath(res.data);
+      }
+    })
+  };
+
   const handleSavePath = () => {
-    setFilePath(tempPath);
     setIsEditingPath(false);
-    message.success('文件路径已保存');
+    ProjectService.modify_system_path({id:1,system_config_path:filePath}).then((res) => {
+      if (res.code == 0) {
+        message.success(res.message);
+      } else {
+        message.error(res.message);
+      }
+    })
   };
 
   const handleEditPath = () => {
-    setTempPath(filePath);
     setIsEditingPath(true);
   };
 
@@ -72,8 +84,6 @@ function SettingsPage() {
   const handleSave = (id: number) => {
     const projectToSave = projects.find(project => project.id === id);
     if (projectToSave) {
-      // 判断是新增还是更新
-      // 检查项目是否存在于原始数据中
       const isNewProject = !originalProjects.some(p => p.id === id);
       if (isNewProject) {
         // 新增项目
@@ -125,10 +135,8 @@ function SettingsPage() {
   };
 
   const cancelEdit = (id: number) => {
-    // 从原始数据中找到对应的项目
     const originalProject = originalProjects.find(p => p.id === id);
     if (originalProject) {
-      // 更新项目列表，恢复原始数据
       const updated = projects.map((project) =>
         project.id === id ? { ...originalProject, isEditing: false } : project
       );
@@ -261,8 +269,8 @@ function SettingsPage() {
         {isEditingPath ? (
           <>
             <Input
-              value={tempPath}
-              onChange={(e) => setTempPath(e.target.value)}
+              value={filePath}
+              onChange={(e) => setFilePath(e.target.value)}
               placeholder="请输入文件路径"
               style={{ width: 400, marginRight: 8 }}
             />

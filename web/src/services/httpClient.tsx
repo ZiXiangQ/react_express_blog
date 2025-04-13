@@ -17,7 +17,7 @@ export interface RspModel {
 export type PostBodyModel = object;
 
 class HttpClient {
-    constructor() {}
+    constructor() { }
 
     /**
      * 处理普通 JSON 响应

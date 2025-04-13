@@ -1,0 +1,194 @@
+.markdown-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  &.light {
+    --bg-color: #ffffff;
+    --text-color: #333;
+    --code-bg: #f6f8fa;
+    --border-color: #eaecef;
+  }
+  
+  &.dark {
+    --bg-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --code-bg: #2d2d2d;
+    --border-color: #444;
+  }
+
+  .markdown-meta {
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 1px solid var(--border-color);
+
+    h1 {
+      margin: 0 0 0.5em;
+      color: var(--heading-color);
+    }
+
+    .date {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      margin: 0.5em 0;
+    }
+
+    .tags {
+      margin-top: 0.5em;
+      .ant-tag {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .markdown-content {
+    display: flex;
+    gap: 24px;
+  }
+
+  .toc-sidebar {
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    
+    .ant-anchor {
+      padding-left: 8px;
+    }
+  }
+
+  .markdown-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .code-block-wrapper {
+    position: relative;
+    margin: 16px 0;
+    
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 8px;
+      background: var(--code-bg);
+      border-radius: 4px 4px 0 0;
+      
+      .code-language {
+        font-size: 12px;
+        color: var(--text-color);
+        opacity: 0.7;
+      }
+      
+      .copy-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+    margin: 16px 0;
+    
+    table {
+      min-width: 100%;
+      
+      th, td {
+        padding: 12px;
+        border: 1px solid var(--border-color);
+      }
+      
+      th {
+        background: var(--code-bg);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .markdown-content {
+    flex-direction: column;
+    
+    .toc-sidebar {
+      position: static !important;
+      width: 100% !important;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+  // 代码块
+  pre {
+    margin: 1em 0;
+    padding: 16px;
+    background-color: var(--code-bg);
+    border-radius: 6px;
+    overflow: auto;
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+  }
+
+  // 行内代码
+  code {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: var(--code-bg);
+    border-radius: 3px;
+  }
+
+  // 表格
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+
+    th, td {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: var(--table-header-bg);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--table-row-bg);
+    }
+  }
+
+    // 引用
+    blockquote {
+      margin: 1em 0;
+      padding: 0 1em;
+      color: var(--text-secondary);
+      border-left: 4px solid var(--border-color);
+    }
+  
+    // 水平线
+    hr {
+      margin: 2em 0;
+      border: none;
+      border-top: 1px solid var(--border-color);
+    }
+  
+    // 图片
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 1em 0;
+      border-radius: 4px;
+    }

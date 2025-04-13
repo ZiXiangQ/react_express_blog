@@ -22,6 +22,10 @@
   --warning-color: #faad14;
   --error-color: #f5222d;
   --info-color: #177ddc;
+  --heading-color: #e6e6e6;
+  --code-bg: #1e1e1e;
+  --table-header-bg: #1e1e1e;
+  --table-row-bg: #141414;
 }
 
 /* body 背景和颜色 - 依赖 app-container 的类 */

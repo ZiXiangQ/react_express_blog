@@ -2,14 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
 import { Dropdown, Layout, Menu, message } from 'antd';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'; // 导入 Outlet
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ProjectService from '@/services/api/project';
-import { childProjectItem, folderKey, projectItem, projectList } from '@/types/project';
+import { childProjectItem, folderKey, projectItem, projectList, FileTree } from '@/types/project';
 import LeftMenu from './component/leftMenu';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 
 const PageLayout: React.FC = () => {
+  const getCurrentProjectKey = () => {
+    const pathSegments = decodeURIComponent(location.pathname).split('/');
+    return pathSegments[1] === 'home' ? 'home' : pathSegments[1];
+  };
   const { Header, Content } = Layout;
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,8 +22,8 @@ const PageLayout: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
   const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
-  const [leftMenuData, setLeftMenuData] = useState<folderKey>();
-  const [currentKey, setCurrentKey] = useState<string>('home'); // 当前选中的导航项
+  const [leftMenuData, setLeftMenuData] = useState<FileTree | folderKey>();
+  const [currentKey, setCurrentKey] = useState<string>(getCurrentProjectKey()); // 从 URL 获取初始值
   const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
 
@@ -41,10 +45,30 @@ const PageLayout: React.FC = () => {
     });
   }, []);
 
+  // 转换数据格式
+  const transformData = (data: folderKey | FileTree): FileTree => {
+    if (Array.isArray(data)) {
+      return data as FileTree;
+    }
+    // 如果是对象形式的数据，转换为数组形式
+    return Object.keys(data).map(key => {
+      return {
+        name: key,
+        path: `folder_${key}`,
+        type: 'folder',
+        children: data[key]
+      };
+    });
+  };
+
   const get_children_tree = (currentKey: string) => {
     ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
       if (rsp.code == 0) {
-        setLeftMenuData(rsp.data);
+        // 处理数据格式转换
+        const responseData = rsp.data;
+        // 转换数据格式
+        const transformedData = transformData(responseData);
+        setLeftMenuData(transformedData);
       } else {
         message.error(rsp.message);
       }
@@ -82,6 +106,9 @@ const PageLayout: React.FC = () => {
     navigate('/setting');
   };
 
+    // 获取当前路径的项目 key
+
+
   useEffect(() => {
     if (!loading && projectsList.length > 0) {
       const projectItems: MenuItem[] = !loading && projectsList.length > 0
@@ -94,7 +121,13 @@ const PageLayout: React.FC = () => {
       projectItems.unshift({ key: 'home', label: '首页', type: 'item' });
       setProjcetsItems(projectItems);
     }
-  }, [loading, projectsList]);
+    const currentProjectKey = getCurrentProjectKey();
+    console.log(currentProjectKey);
+    if (currentProjectKey !== 'home') {
+      projectKey.current = currentProjectKey;
+      get_children_tree(currentProjectKey);
+    }
+  }, [loading, projectsList,location.pathname]);
 
   // 用户操作菜单
   const menu = (
@@ -125,6 +158,7 @@ const PageLayout: React.FC = () => {
           items={projectItems}
           onClick={handleMenuClick}
           style={{width: '80%'}}
+          
         />
         <div className="header-right">
           <Dropdown overlay={menu} placement="bottomRight">
@@ -137,7 +171,7 @@ const PageLayout: React.FC = () => {
       </Header>
       <Layout className="main-layout">
         {currentKey !== 'home' && leftMenuData && (
-          <LeftMenu data={leftMenuData} projectKey={projectKey.current} />
+          <LeftMenu data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)} projectKey={projectKey.current} />
         )}
         <Layout>
           <Content className="content">

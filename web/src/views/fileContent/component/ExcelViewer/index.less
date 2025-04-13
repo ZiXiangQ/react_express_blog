@@ -1,0 +1,73 @@
+.excel-viewer {
+  height: 100%;
+  
+  .ant-card-body {
+    padding: 12px;
+    height: calc(100% - 57px);
+  }
+
+  .excel-tabs {
+    height: 100%;
+
+    .ant-tabs-content {
+      height: calc(100% - 44px);
+    }
+
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+  }
+
+  .ant-table-wrapper {
+    height: 100%;
+  }
+
+  .ant-table {
+    .ant-table-cell {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // 自定义滚动条样式
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scroll-track-bg, #f0f0f0);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb-bg, #ccc);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--scroll-thumb-hover-bg, #999);
+    }
+  }
+
+  // 标签页样式优化
+  .ant-tabs-nav {
+    margin-bottom: 12px;
+  }
+
+  .ant-tabs-tab {
+    padding: 6px 16px;
+    
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  .ant-tabs-tab-active {
+    background-color: var(--primary-color) !important;
+    
+    .ant-tabs-tab-btn {
+      color: white !important;
+    }
+  }
+}

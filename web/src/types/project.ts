@@ -20,16 +20,27 @@ export interface projectList extends RspModel {
     data:projectItem[];
 }
 
-export interface fileKey {
-    name:string;
-    path:string;
-}
-export interface folderKey {
-    [folderName:string]:fileKey[];
+export interface sysPath extends RspModel {  //系统路径
+    data:string;
 }
 
+export interface fileKey {
+    name: string;
+    path: string;
+    type: string;
+    children?: fileKey[];
+}
+
+// 更新 folderKey 以支持两种格式
+export interface folderKey {
+    [folderName: string]: fileKey[];
+}
+
+// 新增 FileTree 类型，用于表示树形结构
+export type FileTree = fileKey[];
+
 export interface childProjectItem extends RspModel {
-    data:folderKey;
+    data: folderKey | FileTree;
 }
 
 export interface fileContent extends RspModel {

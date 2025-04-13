@@ -1,11 +1,10 @@
 /* PageLayout.less */
 .layout {
-  height: 100vh-50px; // 使布局填满整个视口高度
+  height: 100vh; // 使布局填满整个视口高度
   width: 100vw; // 使布局填满整个视口宽度
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-
+  overflow: hidden;
   &.light {
     background-color: #f0f2f5;
     
@@ -143,12 +142,22 @@
     }
   }
 
-
-
-  .content {
+  .content-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
     position: relative;
     z-index: 1;
+    overflow: hidden;
+    transition: background-color var(--animation-duration);
+  }
+
+  .content {
+    z-index: 1;
+    height: calc(100vh - 50px); // 减去 Header 高度
     flex: 1;
+    overflow: auto;
+    box-sizing: border-box;
     /* 移除背景色设置，由 theme.css 控制 */
     /* background-color: var(--bg-primary-light); */
     /* transition: background-color var(--animation-duration); */

@@ -1,91 +1,124 @@
-/*
- * @Author: qiuzx
- * @Date: 2025-01-03 15:02:05
- * @LastEditors: qiuzx
- * @Description: description
- */
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Spin, Alert } from 'antd';
-import axios from 'axios';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useLocation } from 'react-router-dom';
+import { Spin, message } from 'antd';
+import ProjectService from '@/services/api/project';
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import 'highlight.js/styles/github.css';
+import 'katex/dist/katex.min.css';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import './index.less';
+import MarkdownRenderer from './component/MarkdownRenderer';
+import ExcelViewer from './component/ExcelViewer';
+
+
+interface FileResponse {
+  code: number;
+  data: {
+    content: string;
+    type: string;
+    meta?: Record<string, string>;
+  };
+  message?: string;
+}
 
 const FileContent: React.FC = () => {
-  const { projectKey, filePath } = useParams<{ projectKey: string; filePath: string }>();
-  const { theme } = useTheme();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [content, setContent] = useState<string>('');
-  const [contentType, setContentType] = useState<string>('');
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [fileContent, setFileContent] = useState<any>(null);
+  const [fileType, setFileType] = useState<string>('');
+  const [fileMeta, setFileMeta] = useState<Record<string, string>>({});
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   useEffect(() => {
-    if (!filePath || !projectKey) {
-      setError('Invalid file path or project key.');
-      setLoading(false);
-      return;
-    }
     const fetchFileContent = async () => {
       try {
-        const requestData = {
-          file_path: `${projectKey}/${filePath}`,
-        };
-        const response = await axios.post('http://127.0.0.1:11055/file_handle/file_read', requestData, {
-          responseType: filePath.endsWith('.pdf') ? 'blob' : 'json', // 对 PDF 文件设置为二进制流
-        });
-        if (filePath.endsWith('.pdf')) {
-          // 处理 PDF 文件，生成 Blob URL
-          const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-          const url = URL.createObjectURL(pdfBlob);
-          setPdfUrl(url);
-        } else {
-          // 处理其他文件内容
-          const { content, type } = response.data;
-          setContent(content);
-          setContentType(type || 'text');
+        const params = new URLSearchParams(location.search);
+        const filePath = params.get('path');
+        if (!filePath) {
+          message.error('文件路径不存在');
+          return;
         }
-      } catch (err) {
-        console.error('Error fetching file content:', err);
-        setError('Failed to fetch file content.');
+        // 获取文件扩展名
+        const extension = filePath.split('.').pop()?.toLowerCase() || '';
+        setFileType(extension);
+        const response = await ProjectService.get_file_content({ file_path: filePath });
+        if (typeof response === 'string') {
+          // PDF 文件直接返回 URL
+          setFileContent(response);
+        } else {
+          const fileResponse = response as FileResponse;
+          if (fileResponse.code === 0 && fileResponse.data) {
+            setFileContent(fileResponse.data.content);
+            setFileType(fileResponse.data.type || extension);
+            if (fileResponse.data.meta) {
+              setFileMeta(fileResponse.data.meta);
+            }
+          } else {
+            message.error(fileResponse.message || '获取文件内容失败');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching file content:', error);
+        message.error('获取文件内容失败');
       } finally {
         setLoading(false);
       }
     };
 
     fetchFileContent();
-  }, [projectKey, filePath]);
+  }, [location]);
 
-  if (loading) {
-    return <Spin tip="Loading..." />;
-  }
+  const renderPdf = () => (
+    <div className="pdf-viewer-container">
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+        <Viewer
+          fileUrl={fileContent || ''}
+          plugins={[defaultLayoutPluginInstance]}
+          defaultScale={1}
+        />
+      </Worker>
+    </div>
+  );
 
-  if (error) {
-    return <Alert message="Error" description={error} type="error" showIcon />;
-  }
+  const renderContent = () => {
+    if (loading) {
+      return <Spin size="large" />;
+    }
+    if (!fileContent) {
+      return <div className="empty-content">暂无内容</div>;
+    }
+    console.log(fileType);
+    switch (fileType) {
+      case 'md':
+      case 'markdown':
+        return MarkdownRenderer({ content: fileContent, meta: fileMeta });
+      case 'pdf':
+      case 'doc':
+      case 'docx': // Word文件会被后端转换为PDF
+        return renderPdf();
+      case 'xlsx':
+      case 'excel':
+        return (
+          <div>
+            <ExcelViewer data={{
+              content: fileContent,
+              meta: {
+                sheets_count: Number(fileMeta?.sheets_count || 1),
+                filename: fileMeta?.filename || ''
+              }
+            }} />
+          </div>
+        );
+      default:
+        return <div className="unsupported-type">不支持的文件类型: {fileType}</div>;
+    }
+  };
 
   return (
-    <div className={`file-content ${theme}`}>
-      {contentType === 'html' && (
-        <div
-          className='html-content'
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
-      )}
-      {contentType === 'text' && (
-        <pre
-          className='text-content'
-        >
-          {content}
-        </pre>
-      )}
-      {pdfUrl && (
-        <iframe
-          src={pdfUrl}
-          style={{ flex: 1, border: 'none', width: '100%', height: '100%' }}
-          title="PDF Viewer"
-        />
-      )}
+    <div className="file-content-container">
+      {renderContent()}
     </div>
   );
 };
