@@ -79,28 +79,38 @@ class ProjectService:
         project_path = os.path.join(root_path, path)  # 确保路径是绝对路径
         if not os.path.exists(project_path):
             raise APIException('路径不存在')
+        
         def traverse_directory(current_path):
             """
             遍历当前目录及其子目录，构建文件夹与文件的层级关系。
             """
-            result = []
+            folders = []
+            files = []
+            
             # 遍历当前目录中的所有文件和子目录
             for entry in os.scandir(current_path):
                 entry_path = Path(entry.path).resolve()  # 获取绝对路径
-                if entry.is_dir():  # 如果是子文件夹，递归遍历
+                if entry.is_dir() and entry.name != 'resource':  # 如果是子文件夹，递归遍历 ##不遍历resource文件夹
                     folder_data = {
                         'name': entry.name,
                         'path': str(entry_path),
                         'type': 'folder',
                         'children': traverse_directory(entry.path)  # 递归处理子文件夹
                     }
-                    result.append(folder_data)
-                elif entry.is_file():  # 如果是文件，添加文件名和相对路径
-                    result.append({
+                    folders.append(folder_data)
+                elif entry.is_file() and entry.name != '.DS_Store':  # 如果是文件，添加文件名和相对路径
+                    files.append({
                         'name': entry.name,
                         'path': str(entry_path),
                         'type': entry.name.split('.')[-1].lower(),
                     })
-            return result
+            
+            # 分别对文件夹和文件按名称排序
+            folders.sort(key=lambda x: x['name'].lower())
+            files.sort(key=lambda x: x['name'].lower())
+            
+            # 返回排序后的结果：文件夹在前，文件在后
+            return folders + files
+            
         file_data = traverse_directory(project_path)
         return file_data

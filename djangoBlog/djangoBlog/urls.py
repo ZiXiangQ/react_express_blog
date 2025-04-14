@@ -10,5 +10,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user_handle/', include('user_handle.urls')),  # 引用 user 应用的 URL 路由
-    path('file_handle/', include('file_handle.urls'))
+    path('file_handle/', include('file_handle.urls')),
+    path('search_engine/', include('search_engine.urls'))
 ]

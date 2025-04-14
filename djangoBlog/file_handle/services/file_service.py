@@ -10,7 +10,6 @@ import os
 import shutil
 from django.conf import settings
 import pandas as pd
-import markdown
 from django.http import FileResponse
 from rest_framework.exceptions import APIException
 from urllib.parse import quote
