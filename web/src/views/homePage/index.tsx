@@ -4,49 +4,126 @@
  * @LastEditors: qiuzx
  * @Description: description
  */
-import React, { useEffect } from 'react';
-import { Typography, Button } from 'antd';
-import { RightOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Typography, Input, Empty, Spin, List, Space } from 'antd';
+import { SearchOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
+import Searchservice from '@/services/api/search';
+import { searchResult } from '@/types/search';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setSelectedKeys } from '@/store/slices/menuSlice';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
+const { Search } = Input;
+
+interface SearchResult {
+  filename: string;
+  project: string;
+  route: string;
+  full_path: string;
+}
 
 const Home = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchVisible, setSearchVisible] = useState(false);
 
-  useEffect(() => {
-    calcuFunc();
-    return () => {
-    };
-  }, []);
-
-  const calcuFunc = () => {
-    const elements = [[1, 3], [2, 6], [8, 10], [15, 18]];
-    elements.sort((p, q) => p[0] - q[0]); // 按照左端点从小到大排序
-    const ans = [];
-    for (const p of elements) {
-      const m = ans.length;
-      if (m && p[0] <= ans[m - 1][1]) { // 可以合并
-        ans[m - 1][1] = Math.max(ans[m - 1][1], p[1]); // 更新右端点最大值
-      } else { // 不相交，无法合并
-        ans.push(p); // 新的合并区间
-      }
+  const handleSearch = async (keyword: string) => {
+    if (!keyword.trim()) {
+      setSearchResults([]);
+      return;
     }
-    console.log(ans);
+    setLoading(true);
+    try {
+      const response:searchResult = await Searchservice.search_files(keyword);
+      console.log(response);
+      if (response.code == 0) {
+        setSearchResults(response.data);
+        setSearchVisible(true);
+      }
+    } catch (error) {
+      console.error('搜索失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
-  
+
+  const handleResultClick = (result: SearchResult) => {
+    // 构建菜单路径
+    const menuPath = `/${result.project}`;
+    const fullPath = `${menuPath}/file?path=${encodeURIComponent(result.full_path)}`;
+    
+    // 更新菜单选中状态
+    dispatch(setSelectedKeys({
+      selectedKeys: [menuPath],
+      openKeys: [result.project],
+      currentPath: fullPath
+    }));
+
+    // 导航到文件页面
+    navigate(fullPath);
+  };
 
   return (
     <div className={`home-container ${theme}`}>
-      <Title level={2}>欢迎访问知识文档</Title>
-      <Paragraph style={{ fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>
-        这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。
-      </Paragraph>
-      <Button type="primary" size="large" style={{ marginTop: '20px' }}>
-        开始浏览 <RightOutlined />
-      </Button>
-      {/* <FlowDiagram></FlowDiagram> */}
+      <div className="search-section">
+        <Title level={2}>欢迎访问知识文档</Title>
+        <Paragraph style={{ fontSize: '18px', maxWidth: '600px', margin: '20px auto' }}>
+          这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。
+        </Paragraph>
+        
+        <div className="search-box">
+          <Search
+            placeholder="搜索文档..."
+            allowClear
+            enterButton={<SearchOutlined />}
+            size="large"
+            onSearch={handleSearch}
+            style={{ maxWidth: '600px', width: '100%' }}
+          />
+        </div>
+
+        {searchVisible && (
+          <div className="search-results">
+            <Spin spinning={loading}>
+              {searchResults.length > 0 ? (
+                <List
+                  className="result-list"
+                  itemLayout="horizontal"
+                  dataSource={searchResults}
+                  renderItem={(item) => (
+                    <List.Item 
+                      className="result-item"
+                      onClick={() => handleResultClick(item)}
+                    >
+                      <Space align="start">
+                        <FileTextOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+                        <div>
+                          <Text strong>{item.filename}</Text>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: '12px' }}>
+                            项目: {item.project}
+                          </Text>
+                        </div>
+                      </Space>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty 
+                  description="未找到相关文档" 
+                  style={{ padding: '40px 0' }}
+                />
+              )}
+            </Spin>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

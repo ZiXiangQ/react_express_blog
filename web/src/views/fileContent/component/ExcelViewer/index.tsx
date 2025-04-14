@@ -61,7 +61,7 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ data }) => {
     );
   };
 
-  const items = data.content.map((sheet, index) => ({
+  const items = data.content?.map((sheet, index) => ({
     key: index.toString(),
     label: sheet?.name || `工作表 ${index + 1}`,
     children: renderTable(sheet),

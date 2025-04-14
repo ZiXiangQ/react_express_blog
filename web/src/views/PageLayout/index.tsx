@@ -8,6 +8,7 @@ import { childProjectItem, folderKey, projectItem, projectList, FileTree } from 
 import LeftMenu from './component/leftMenu';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
+import logo from '@/assets/logo.svg';
 
 const PageLayout: React.FC = () => {
   const getCurrentProjectKey = () => {
@@ -148,8 +149,10 @@ const PageLayout: React.FC = () => {
     <Layout className={`layout ${theme}`}>
       <Header className="header">
         <div className="header-left">
-          <div className="demo-logo" />
-          <span className="title">知识库</span>
+        <div className="logo-container">
+          <img src={logo} alt="logo" className="logo" />
+        </div>
+      <span className="title">知识库</span>
         </div>
         <Menu
           theme={theme}
