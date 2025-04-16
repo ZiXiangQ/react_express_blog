@@ -164,7 +164,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
                 ? openKeys.filter(k => k !== item.key)
                 : [...openKeys, item.key];
               setOpenKeys(newOpenKeys);
-              setIsAllExpanded(false); // ✅ 关闭全展开状态，让点击起作用
+              setIsAllExpanded(false);
             }}
             
           >
