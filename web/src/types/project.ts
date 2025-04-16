@@ -6,25 +6,25 @@
  */
 import { RspModel } from "@/services/httpClient";
 
-export interface projectItem {
-    id:number;
-    project_name?:string;
-    project_key?:string;
-    visible_users?:string;
-    type?:string;
-    isEditing?:boolean;
+export interface projectItem { //项目
+    id: number;
+    project_name?: string;
+    project_key?: string;
+    visible_users?: string;
+    type?: string;
+    isEditing?: boolean;
 }
 
 export interface projectList extends RspModel {
     map(arg0: (item: projectItem) => { isEditing: boolean; id?: number; project_name?: string; project_key?: string; visible_users?: string; type?: string; }): unknown;
-    data:projectItem[];
+    data: projectItem[];
 }
 
 export interface sysPath extends RspModel {  //系统路径
-    data:string;
+    data: string;
 }
 
-export interface fileKey {
+export interface fileKey { //文件路径
     name: string;
     path: string;
     type: string;
@@ -39,15 +39,29 @@ export interface folderKey {
 // 新增 FileTree 类型，用于表示树形结构
 export type FileTree = fileKey[];
 
-export interface childProjectItem extends RspModel {
+export interface childProjectItem extends RspModel { //子项目
     data: folderKey | FileTree;
 }
 
-export interface fileContent extends RspModel {
+export interface fileContent extends RspModel { //文件内容
     blob: fileContent;
     data:
     {
-        content:string,
-        type?:string
+        content: string,
+        type?: string
     }
+}
+
+export interface LeftMenuProps {//左侧菜单
+    data: fileKey[];
+    projectKey: string;
+}
+
+export interface FlattenedItem {//扁平化树
+    key: string;
+    label: string;
+    level: number;
+    isFolder: boolean;
+    type: string;
+    parentKey?: string;
 }

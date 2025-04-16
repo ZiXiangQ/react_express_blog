@@ -40,9 +40,7 @@ const PageLayout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(reduxSelectedKeys, reduxOpenKeys)
     if (reduxSelectedKeys) {
-      console.log(reduxSelectedKeys[0], '2222')
       setCurrentKey(reduxOpenKeys[0]);
     }
   }, [reduxSelectedKeys, reduxOpenKeys])
@@ -116,8 +114,6 @@ const PageLayout: React.FC = () => {
     navigate('/setting');
   };
 
-  // 获取当前路径的项目 key
-
 
   useEffect(() => {
     if (!loading && projectsList.length > 0) {
@@ -169,7 +165,6 @@ const PageLayout: React.FC = () => {
           items={projectItems}
           onClick={handleMenuClick}
           style={{ width: '80%' }}
-
         />
         <div className="header-right">
           <Dropdown overlay={menu} placement="bottomRight">

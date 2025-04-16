@@ -41,7 +41,6 @@ const Home = () => {
     setLoading(true);
     try {
       const response:searchResult = await Searchservice.search_files(keyword);
-      console.log(response);
       if (response.code == 0) {
         setSearchResults(response.data);
         setSearchVisible(true);
@@ -54,18 +53,13 @@ const Home = () => {
   };
 
   const handleResultClick = (result: SearchResult) => {
-    // 构建菜单路径
     const menuPath = `/${result.project}`;
     const fullPath = `${menuPath}/file?path=${encodeURIComponent(result.full_path)}`;
-    
-    // 更新菜单选中状态
     dispatch(setSelectedKeys({
       selectedKeys: [menuPath],
       openKeys: [result.project],
       currentPath: fullPath
     }));
-
-    // 导航到文件页面
     navigate(fullPath);
   };
 
