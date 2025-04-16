@@ -6,7 +6,7 @@
  */
 // components/FileIcon.tsx
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { 
+import {
   faFileWord,
   faFileExcel,
   faFilePowerpoint,
@@ -78,7 +78,7 @@ const FileIcon = ({ type, className = '' }: FileIconProps) => {
   const { icon, color, bgColor } = getIconConfig()
 
   return (
-    <div 
+    <div
       className={`file-icon ${className}`}
       style={{
         width: '20px',
@@ -91,12 +91,12 @@ const FileIcon = ({ type, className = '' }: FileIconProps) => {
         marginRight: '10px'
       }}
     >
-      <FontAwesomeIcon 
-        icon={icon} 
-        style={{ 
+      <FontAwesomeIcon
+        icon={icon}
+        style={{
           fontSize: '12px',
           color: color
-        }} 
+        }}
       />
     </div>
   )

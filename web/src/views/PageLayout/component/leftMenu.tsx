@@ -46,10 +46,8 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
   // 监听 data 变化，更新 filteredData
   useEffect(() => {
     if (searchValue) {
-      // 如果有搜索值，重新执行搜索
       handleSearch(searchValue);
     } else {
-      // 否则直接更新 filteredData
       setFilteredData(data);
     }
   }, [data]);
@@ -73,7 +71,13 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
         result = result.concat(flattenTree(item.children || [], level + 1, item.path));
       }
     });
+    console.log(result, 'result')
     return result;
+  };
+
+  const getSelectedKey = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get('path') || '';
   };
 
   // 当数据、展开状态或搜索值变化时，更新扁平化列表
@@ -81,11 +85,6 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
     const flattened = flattenTree(filteredData);
     setFlattenedItems(flattened);
   }, [filteredData, openKeys, isAllExpanded]);
-
-  const getSelectedKey = () => {
-    const params = new URLSearchParams(location.search);
-    return params.get('path') || '';
-  };
 
   const handleFileClick = (path: string) => {
     navigate(`/${projectKey}/file?path=${encodeURIComponent(path)}`);
@@ -146,18 +145,13 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
       }, []);
     };
 
-    const filtered = searchInItems(data);
+  const filtered = searchInItems(data);
     setFilteredData(filtered);
-  };
-
-  const handleOpenChange = (keys: string[]) => {
-    setOpenKeys(keys);
   };
 
   const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
     const item = flattenedItems[index];
     if (!item) return null;
-
     const isSelected = item.key === getSelectedKey();
 
     if (item.isFolder) {

@@ -9,6 +9,7 @@ import LeftMenu from './component/leftMenu';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 import logo from '@/assets/logo.svg';
+import { useAppSelector } from '@/store/hooks';
 
 const PageLayout: React.FC = () => {
   const getCurrentProjectKey = () => {
@@ -28,6 +29,8 @@ const PageLayout: React.FC = () => {
   const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
 
+  const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys } = useAppSelector(state => state.menu);
+
   // 获取用户信息
   useEffect(() => {
     const storeUsername = localStorage.getItem('username');
@@ -35,6 +38,14 @@ const PageLayout: React.FC = () => {
       setUsername(storeUsername);
     }
   }, []);
+
+  useEffect(() => {
+    console.log(reduxSelectedKeys, reduxOpenKeys)
+    if (reduxSelectedKeys) {
+      console.log(reduxSelectedKeys[0], '2222')
+      setCurrentKey(reduxOpenKeys[0]);
+    }
+  }, [reduxSelectedKeys, reduxOpenKeys])
 
   // 获取项目列表
   useEffect(() => {
@@ -65,9 +76,7 @@ const PageLayout: React.FC = () => {
   const get_children_tree = (currentKey: string) => {
     ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
       if (rsp.code == 0) {
-        // 处理数据格式转换
         const responseData = rsp.data;
-        // 转换数据格式
         const transformedData = transformData(responseData);
         setLeftMenuData(transformedData);
       } else {
@@ -107,7 +116,7 @@ const PageLayout: React.FC = () => {
     navigate('/setting');
   };
 
-    // 获取当前路径的项目 key
+  // 获取当前路径的项目 key
 
 
   useEffect(() => {
@@ -123,12 +132,11 @@ const PageLayout: React.FC = () => {
       setProjcetsItems(projectItems);
     }
     const currentProjectKey = getCurrentProjectKey();
-    console.log(currentProjectKey);
     if (currentProjectKey !== 'home') {
       projectKey.current = currentProjectKey;
       get_children_tree(currentProjectKey);
     }
-  }, [loading, projectsList,location.pathname]);
+  }, [loading, projectsList, location.pathname]);
 
   // 用户操作菜单
   const menu = (
@@ -149,10 +157,10 @@ const PageLayout: React.FC = () => {
     <Layout className={`layout ${theme}`}>
       <Header className="header">
         <div className="header-left">
-        <div className="logo-container">
-          <img src={logo} alt="logo" className="logo" />
-        </div>
-      <span className="title">知识库</span>
+          <div className="logo-container">
+            <img src={logo} alt="logo" className="logo" />
+          </div>
+          <span className="title">知识库</span>
         </div>
         <Menu
           theme={theme}
@@ -160,8 +168,8 @@ const PageLayout: React.FC = () => {
           selectedKeys={[currentKey]}
           items={projectItems}
           onClick={handleMenuClick}
-          style={{width: '80%'}}
-          
+          style={{ width: '80%' }}
+
         />
         <div className="header-right">
           <Dropdown overlay={menu} placement="bottomRight">
