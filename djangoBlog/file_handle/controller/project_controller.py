@@ -2,9 +2,8 @@
 Author: qiuzx
 Date: 2025-04-09 22:28:21
 LastEditors: qiuzx
-Description: description
+Description: file_handle/controllers.py
 '''
-# file_handle/controllers.py
 
 import os
 from rest_framework.decorators import api_view

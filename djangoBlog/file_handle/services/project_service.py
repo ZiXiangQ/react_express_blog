@@ -2,9 +2,8 @@
 Author: qiuzx
 Date: 2025-04-09 22:29:18
 LastEditors: qiuzx
-Description: description
+Description: file_handle/services.py
 '''
-# file_handle/services.py
 
 import os
 from file_handle.models import Project, SystemSetting
@@ -81,13 +80,8 @@ class ProjectService:
             raise APIException('路径不存在')
         
         def traverse_directory(current_path):
-            """
-            遍历当前目录及其子目录，构建文件夹与文件的层级关系。
-            """
             folders = []
             files = []
-            
-            # 遍历当前目录中的所有文件和子目录
             for entry in os.scandir(current_path):
                 entry_path = Path(entry.path).resolve()  # 获取绝对路径
                 if entry.is_dir() and entry.name != 'resource':  # 如果是子文件夹，递归遍历 ##不遍历resource文件夹
@@ -104,13 +98,8 @@ class ProjectService:
                         'path': str(entry_path),
                         'type': entry.name.split('.')[-1].lower(),
                     })
-            
-            # 分别对文件夹和文件按名称排序
             folders.sort(key=lambda x: x['name'].lower())
             files.sort(key=lambda x: x['name'].lower())
-            
-            # 返回排序后的结果：文件夹在前，文件在后
             return folders + files
-            
         file_data = traverse_directory(project_path)
         return file_data

@@ -29,4 +29,5 @@ urlpatterns = [
     path('project/get_children_tree', get_children_tree, name='get_children_tree'),  # 获取子目录
     path('project/get_system_path', get_system_path, name='get_system_path'),  # 获取系统路径
     path('project/modify_system_path', modify_system_path, name='modify_system_path'),  # 修改系统路径
+
 ]
