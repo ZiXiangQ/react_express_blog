@@ -20,9 +20,10 @@ interface MarkdownRendererProps {
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) => {
+  const markdownContent = typeof content === 'string' ? content : '';
+
   return (
     <div className="markdown-container">
-      {/* 显示元数据（如果有） */}
       {meta && Object.keys(meta).length > 0 && (
         <div className="markdown-meta">
           <h2>文档信息</h2>
@@ -55,9 +56,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
               <table {...props} />
             </div>
           ),
-          code: ({ inline, className, children, ...props }) => {
+          code: ({ className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
-            return !inline && match ? (
+            return  match ? (
               <div className="code-block">
                 <div className="code-language">{match[1]}</div>
                 <code className={className} {...props}>
@@ -72,7 +73,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
           }
         }}
       >
-        {content}
+        {markdownContent}
       </ReactMarkdown>
     </div>
   );

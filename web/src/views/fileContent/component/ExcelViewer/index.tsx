@@ -1,30 +1,22 @@
+/*
+ * @Author: qiuzx
+ * @Date: 2025-04-12 19:42:25
+ * @LastEditors: qiuzx
+ * @Description: Excel文件查看器
+ */
 import React, { useState } from 'react';
 import { Table, Card, Tabs } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import './index.less';
+import { excelContent, SheetData } from '@/types/project';
 
-interface SheetData {
-  name: string;
-  headers: Array<{
-    value: string;
-    width: number;
-  }>;
-  rows: string[][];
+interface IProps {  
+  excelContent: excelContent;
 }
 
-interface ExcelViewerProps {
-  data: {
-    content: SheetData[];
-    meta: {
-      sheets_count: number;
-      filename: string;
-    };
-  };
-}
-
-const ExcelViewer: React.FC<ExcelViewerProps> = ({ data }) => {
+const ExcelViewer: React.FC<IProps> = ({ excelContent }) => {
+  const { content, meta } = excelContent;
   const [activeTab, setActiveTab] = useState('0');
-  console.log(data,'data');
 
   const renderTable = (sheet: SheetData) => {
     const columns: ColumnsType<unknown> = sheet.headers.map((header, index) => ({
@@ -61,7 +53,7 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ data }) => {
     );
   };
 
-  const items = data.content?.map((sheet, index) => ({
+  const items = content?.map((sheet, index) => ({
     key: index.toString(),
     label: sheet?.name || `工作表 ${index + 1}`,
     children: renderTable(sheet),
@@ -69,7 +61,7 @@ const ExcelViewer: React.FC<ExcelViewerProps> = ({ data }) => {
 
   return (
     <Card 
-      title={data?.meta?.filename || 'Excel文件'}
+      title={ meta?.filename || 'Excel文件'}
       className="excel-viewer"
     >
       <Tabs

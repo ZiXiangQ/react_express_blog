@@ -11,28 +11,20 @@ import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import './index.less';
 import MarkdownRenderer from './component/MarkdownRenderer';
 import ExcelViewer from './component/ExcelViewer';
-
-
-interface FileResponse {
-  code: number;
-  data: {
-    content: string;
-    type: string;
-    meta?: Record<string, string>;
-  };
-  message?: string;
-}
+import { mdContent, excelContent, mdDataType, excelDataType } from '@/types/project';
 
 const FileContent: React.FC = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [fileContent, setFileContent] = useState<any>(null);
-  const [fileType, setFileType] = useState<string>('');
-  const [fileMeta, setFileMeta] = useState<Record<string, string>>({});
+  const [fileType, setFileType] = useState<string>('');//文件类型
+  const [mdContent, setMdContent] = useState<mdContent>();//md  
+  const [fileContent, setFileContent] = useState<string>('');//pdf url
+  const [excelContent, setExcelContent] = useState<excelContent>();//excel
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   useEffect(() => {
     const fetchFileContent = async () => {
+      setLoading(true);
       try {
         const params = new URLSearchParams(location.search);
         const filePath = params.get('path');
@@ -40,24 +32,22 @@ const FileContent: React.FC = () => {
           message.error('文件路径不存在');
           return;
         }
-        // 获取文件扩展名
         const extension = filePath.split('.').pop()?.toLowerCase() || '';
         setFileType(extension);
         const response = await ProjectService.get_file_content({ file_path: filePath });
         if (typeof response === 'string') {
-          // PDF 文件直接返回 URL
           setFileContent(response);
-        } else {
-          const fileResponse = response as FileResponse;
-          if (fileResponse.code === 0 && fileResponse.data) {
-            setFileContent(fileResponse.data.content);
-            setFileType(fileResponse.data.type || extension);
-            if (fileResponse.data.meta) {
-              setFileMeta(fileResponse.data.meta);
-            }
-          } else {
-            message.error(fileResponse.message || '获取文件内容失败');
-          }
+        }else if (response.data.type === 'md') {
+          const mdResponse = response as mdDataType;
+          setMdContent({ content: mdResponse.data.content, meta: mdResponse.data.meta });
+          setFileType('md');
+        }else if (response.data.type === 'xlsx' || response.data.type === 'xls') {
+          const excelResponse = response as excelDataType;
+          setExcelContent({ content: excelResponse.data.content, meta: excelResponse.data.meta });
+          setFileType('xlsx');
+        }else{
+          // setFileContent(response);
+          setFileType(extension);
         }
       } catch (error) {
         console.error('Error fetching file content:', error);
@@ -66,7 +56,6 @@ const FileContent: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchFileContent();
   }, [location]);
 
@@ -89,26 +78,20 @@ const FileContent: React.FC = () => {
     if (!fileContent) {
       return <div className="empty-content">暂无内容</div>;
     }
-    console.log(fileType);
     switch (fileType) {
-      case 'md':
-      case 'markdown':
-        return MarkdownRenderer({ content: fileContent, meta: fileMeta });
       case 'pdf':
       case 'doc':
-      case 'docx': // Word文件会被后端转换为PDF
+      case 'docx':
+      case 'ppt':
+      case 'pptx': 
         return renderPdf();
+      case 'md':
+        return <MarkdownRenderer content={mdContent?.content || ''} meta={mdContent?.meta || {}} />;
       case 'xlsx':
-      case 'excel':
+      case 'xls':
         return (
           <div>
-            <ExcelViewer data={{
-              content: fileContent,
-              meta: {
-                sheets_count: Number(fileMeta?.sheets_count || 1),
-                filename: fileMeta?.filename || ''
-              }
-            }} />
+            { excelContent && <ExcelViewer excelContent={excelContent}/>}
           </div>
         );
       default:

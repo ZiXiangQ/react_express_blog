@@ -65,3 +65,36 @@ export interface FlattenedItem {//扁平化树
     type: string;
     parentKey?: string;
 }
+
+///////////文件类型定义
+export interface mdDataType extends RspModel { //md文件内容
+    data: mdContent;
+}
+
+export interface mdContent {
+    content: string;
+    meta: Record<string, string>;
+    type?: string;
+}
+
+export interface excelDataType extends RspModel { //excel文件内容
+    data: excelContent;
+}
+
+export interface excelContent {
+    type?: string;
+    content: SheetData[];
+    meta: {
+        sheets_count: number;
+        filename: string;
+    };
+}
+
+export interface SheetData {
+    name: string;
+    headers: Array<{
+        value: string;
+        width: number;
+    }>;
+    rows: string[][];
+}
