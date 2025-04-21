@@ -111,7 +111,7 @@ const UserManagement: React.FC = () => {
 
   return (
     <div className={`user-management ${theme}`}>
-      <div className="header">
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <h2>用户管理</h2>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal('add')}>
           添加用户

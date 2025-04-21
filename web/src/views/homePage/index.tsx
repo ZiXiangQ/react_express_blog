@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setSelectedKeys } from '@/store/slices/menuSlice';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 const { Search } = Input;
 
 interface SearchResult {
@@ -66,9 +66,9 @@ const Home = () => {
   return (
     <div className={`home-container ${theme}`}>
       <div className="search-section">
-        <Title level={2}>欢迎访问知识文档</Title>
+        {/* <Title level={2}>欢迎访问知识文档</Title> */}
         <Paragraph style={{ fontSize: '18px', maxWidth: '600px', margin: '20px auto' }}>
-          这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。
+          {/* 这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。 */}
         </Paragraph>
         
         <div className="search-box">

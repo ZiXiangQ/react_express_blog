@@ -37,15 +37,15 @@ const FileContent: React.FC = () => {
         const response = await ProjectService.get_file_content({ file_path: filePath });
         if (typeof response === 'string') {
           setFileContent(response);
-        }else if (response.data.type === 'md') {
+        } else if (response.data.type === 'md') {
           const mdResponse = response as mdDataType;
           setMdContent({ content: mdResponse.data.content, meta: mdResponse.data.meta });
           setFileType('md');
-        }else if (response.data.type === 'xlsx' || response.data.type === 'xls') {
+        } else if (response.data.type === 'xlsx' || response.data.type === 'xls') {
           const excelResponse = response as excelDataType;
           setExcelContent({ content: excelResponse.data.content, meta: excelResponse.data.meta });
           setFileType('xlsx');
-        }else{
+        } else {
           // setFileContent(response);
           setFileType(extension);
         }
@@ -75,15 +75,15 @@ const FileContent: React.FC = () => {
     if (loading) {
       return <Spin size="large" />;
     }
-    if (!fileContent) {
-      return <div className="empty-content">暂无内容</div>;
-    }
     switch (fileType) {
       case 'pdf':
       case 'doc':
       case 'docx':
       case 'ppt':
-      case 'pptx': 
+      case 'pptx':
+        if (!fileContent) {
+          return <div className="empty-content">暂无内容</div>;
+        }
         return renderPdf();
       case 'md':
         return <MarkdownRenderer content={mdContent?.content || ''} meta={mdContent?.meta || {}} />;
@@ -91,7 +91,7 @@ const FileContent: React.FC = () => {
       case 'xls':
         return (
           <div>
-            { excelContent && <ExcelViewer excelContent={excelContent}/>}
+            {excelContent && <ExcelViewer excelContent={excelContent} />}
           </div>
         );
       default:

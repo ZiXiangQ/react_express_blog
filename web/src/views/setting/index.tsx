@@ -7,16 +7,13 @@ import {
   Popconfirm,
   Space,
   Divider,
-  Switch,
 } from 'antd';
 import ProjectService from '@/services/api/project';
 import { projectItem } from '@/types/project';
 import '@/styles/theme.css';
-import { useTheme } from '@/contexts/ThemeContext';
 
 
 function SettingsPage() {
-  const { theme, setTheme } = useTheme();
   const [filePath, setFilePath] = useState(''); // 文件路径
   const [isEditingPath, setIsEditingPath] = useState(false); // 是否编辑文件路径
   const [projects, setProjects] = useState<projectItem[]>([]); // 项目列表
@@ -144,10 +141,6 @@ function SettingsPage() {
     }
   };
 
-  const handleThemeChange = (checked: boolean) => {
-    setTheme(checked ? 'dark' : 'light');
-  };
-
   const columns = [
     {
       title: '项目名称',
@@ -244,23 +237,7 @@ function SettingsPage() {
   ];
 
   return (
-    <div style={{padding: 24, backgroundColor: theme === 'dark' ? '#181818' : '#fff' }}>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <h3 style={{ margin: 0 }}>深色模式</h3>
-            <p style={{ margin: '5px 0 0 0', color: 'var(--text-color)' }}>
-              {theme === 'dark' ? '当前使用深色主题' : '当前使用浅色主题'}
-            </p>
-          </div>
-          <Switch
-            checked={theme === 'dark'}
-            onChange={handleThemeChange}
-            checkedChildren="深色"
-            unCheckedChildren="浅色"
-          />
-        </div>
-      </div>
+    <div style={{padding: 24}}>
       <Divider />
       {/* 文件路径配置 */}
       <div style={{ marginBottom: 24 }}>

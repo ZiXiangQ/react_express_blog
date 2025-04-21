@@ -23,35 +23,45 @@
       .header-left {
         display: flex;
         align-items: center;
-        width: 15%;
+        width: 35%;
         .logo-container {
           height: 50px;
           padding: 5px;
+          width: 80px;
           display: flex;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
           border-bottom: 1px solid #f0f0f0;
           background: #fff;
           .logo {
-            height: 35px;
-            width: auto;
-            border-radius: 50%;
+            height: 38px;
+            width: 38px;
+            border-radius: 20%;
             transition: all 0.3s;
           }
         }
         .title {
           font-size: 20px;
           font-weight: 600;
+          width: 100px;
+          margin:0 80px 0  50px;
           margin-left: var(--spacing-md); /* 使用变量 */
           color: var(--text-primary);
           transition: color var(--animation-duration);
         }
       }
 
+      .header-center {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 50%;
+      }
       .header-right {
         display: flex;
         align-items: center;
-        width: 5%;
+        justify-content: flex-end;
+        width: 15%;
         .user-info-trigger {
           display: flex;
           align-items: center;
@@ -83,13 +93,13 @@
   }
 
   &.dark {
-    background-color: #141414;
+    background-color: #1f2129;
     
     .header {
-      background: #1f1f1f;
+      background: #1f2129;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: space-between; /* 水平分布 */
       height: 50px; /* 统一 Header 高度 */
       line-height: 50px; /* 垂直居中 */
       padding: 0 var(--spacing-lg); /* 使用变量设置左右内边距 */
@@ -100,34 +110,44 @@
       .header-left {
         display: flex;
         align-items: center;
-        width: 15%;
+        width: 35%;
         .logo-container {
-          height: 50px;
+          height: 49px;
           padding: 5px;
+          width: 80px;
           display: flex;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
-          border-bottom: 1px solid #f0f0f0;
-          background: #fff;
+          border-bottom: 1px solid #1f2129;
+          background: #1f2129;
           .logo {
-            height: 35px;
-            width: auto;
-            border-radius: 50%;
+            height: 38px;
+            width: 38px;
+            border-radius: 20%;
             transition: all 0.3s;
           }
         }
         .title {
           font-size: 20px;
           font-weight: 600;
+          width: 100px;
+          margin:0 80px 0  50px;
           margin-left: var(--spacing-md); /* 使用变量 */
           color: var(--text-primary);
           transition: color var(--animation-duration);
         }
       }
-
+      .header-center {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 50%;
+      }
       .header-right {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
+        width: 15%;
         .user-info-trigger {
           display: flex;
           align-items: center;
@@ -163,37 +183,10 @@
     }
   }
 
-  .content-layout {
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    transition: background-color var(--animation-duration);
-  }
 
-  .content {
-    z-index: 1;
-    height: calc(100vh - 50px); // 减去 Header 高度
-    flex: 1;
-    overflow: auto;
-    box-sizing: border-box;
-    /* 移除背景色设置，由 theme.css 控制 */
-    /* background-color: var(--bg-primary-light); */
-    /* transition: background-color var(--animation-duration); */
-  }
 
   .sider {
     width: 200px; // Sider 固定宽度
-  }
-
-  /* 浅色主题特定样式 */
-  &.light {
-    background-color: var(--bg-primary-light);
-    .header .header-right .user-info-trigger.hoverable:hover {
-      background-color: rgba(0, 0, 0, 0.025);
-    }
   }
 
   /* 深色主题特定样式 */

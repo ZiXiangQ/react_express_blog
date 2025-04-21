@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Tooltip, Input, Space } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
+import {
   MenuFoldOutlined,
   MenuUnfoldOutlined
 } from '@ant-design/icons';
@@ -30,7 +30,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
 
 
   const getSelectedKey = () => { // 获取选中项
-    const params = new URLSearchParams(location.search);    
+    const params = new URLSearchParams(location.search);
     return params.get('path') || '';
   };
 
@@ -166,7 +166,7 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
               setOpenKeys(newOpenKeys);
               setIsAllExpanded(false);
             }}
-            
+
           >
             <FileIcon type="folder" />
             <span className="item-label">{item.label}</span>

@@ -11,7 +11,6 @@ import BasicService from '@/services/api/base';
 import { LoginValues } from '@/types/base';
 import { useNavigate } from 'react-router-dom';
 
-
 const Login = () => {
     const navigate = useNavigate()
     const onFinish = (values: LoginValues) => {
@@ -27,7 +26,6 @@ const Login = () => {
     return (
         <div className="login-container">
             <div className="form-container">
-                <h2>登录</h2>
                 <Form
                     name="login"
                     onFinish={onFinish}
@@ -36,7 +34,7 @@ const Login = () => {
                     <Form.Item
                         name="username"
                         label="用户名"
-                        rules={[{ required: true, message: '请输入用户名!' }]}
+                        rules={[{ required: true, message: '请输入用户名' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -48,7 +46,7 @@ const Login = () => {
                         <Input.Password />
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" block>
+                        <Button type="primary" block htmlType="submit">
                             登录
                         </Button>
                     </Form.Item>

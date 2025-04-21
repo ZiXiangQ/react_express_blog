@@ -2,10 +2,17 @@
   height: 100%;
   width: 100%;
   padding:24px;
+  overflow-y: auto;
+  .dark & {
+    background: #1f2129;
+  }
   .pdf-viewer-container {
     height: calc(100vh - 100px);
     width: 100%;
     border: 1px solid #e8e8e8;
+    .dark & {
+      border: 1px solid #1f2129;
+    }
   }
 
   .html-container {

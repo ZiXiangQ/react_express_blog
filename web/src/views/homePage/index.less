@@ -11,10 +11,16 @@ body {
   padding: 0 20px;
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
+  .dark & {
+    border-color: #4e4f50;
+  }
 }
 
 .ant-layout-content {
   background: #f0f2f5;
+  .dark & {
+    background: #1f2129;
+  }
 }
 /* 容器样式 */
 .arrow-container {
@@ -111,23 +117,6 @@ body {
 
   .search-box {
     margin: 30px auto;
-    
-    .ant-input-search {
-      .ant-input {
-        border-radius: 24px 0 0 24px;
-        &:focus {
-          box-shadow: none;
-        }
-      }
-      
-      .ant-input-group-addon {
-        .ant-btn {
-          border-radius: 0 24px 24px 0 !important;
-          height: 40px;
-          width: 60px;
-        }
-      }
-    }
   }
 
   .search-results {

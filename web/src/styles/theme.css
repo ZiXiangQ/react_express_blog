@@ -6,6 +6,13 @@
   /* 主要目的是提供一个明确的选择器 */
 }
 
+/* .dark & {
+  background: #1f2129;
+  border-color: #1f2129;
+  color: var(--text-primary);
+} */
+
+
 /* 深色主题变量 - Grafana 风格 */
 .app-container.dark {
   --bg-color: #111217; /* 深色主背景 */
@@ -64,31 +71,6 @@ body {
   background-color: var(--hover-color, var(--hover-color-light));
 }
 
-/* 输入框样式 */
-.ant-input,
-.ant-input-password,
-.ant-input-affix-wrapper {
-  background-color: var(--bg-color, var(--bg-primary-light)) !important;
-  border-color: var(--border-color, #d9d9d9) !important;
-  color: var(--text-primary, black);
-}
-.ant-input-affix-wrapper input {
-   background-color: transparent !important;
-}
-.ant-input::placeholder { 
-    color: var(--text-secondary, rgba(0, 0, 0, 0.65));
-}
-.ant-input-affix-wrapper:hover,
-.ant-input-affix-wrapper:focus,
-.ant-input-affix-wrapper-focused {
-  border-color: var(--primary-color, #1890ff) !important;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-}
-.app-container.dark .ant-input-affix-wrapper:focus,
-.app-container.dark .ant-input-affix-wrapper-focused {
-    box-shadow: 0 0 0 2px rgba(23, 125, 220, 0.4);
-}
-
 /* 按钮样式 */
 .ant-btn {
   color: var(--text-primary, black);
@@ -128,14 +110,7 @@ body {
   background-color: transparent;
 }
 
-.ant-layout-header {
-  background-color: var(--card-bg, var(--bg-content-light));
-  border-bottom: 1px solid var(--border-color, #d9d9d9);
-  color: var(--text-primary, black);
-  padding: 0 var(--spacing-lg);
-  height: 64px;
-  line-height: 64px;
-}
+
 
 .ant-layout-sider {
   background-color: var(--card-bg, var(--bg-content-light));

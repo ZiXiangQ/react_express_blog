@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
-import { Dropdown, Layout, Menu, message } from 'antd';
+import { Divider, Dropdown, Layout, Menu, message, Switch } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ProjectService from '@/services/api/project';
-import { childProjectItem, folderKey, projectItem, projectList, FileTree } from '@/types/project';
-import LeftMenu from './component/leftMenu';
+import { childProjectItem, folderKey, projectItem, projectList, FileTree, fileKey } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 import logo from '@/assets/logo.svg';
 import { useAppSelector } from '@/store/hooks';
+import { useDispatch } from 'react-redux';
+import { setSelectedKeys } from '@/store/slices/menuSlice';
+import LeftMenu from './component/leftMenu';
+import SearchComponent from './component/search';
 
 const PageLayout: React.FC = () => {
   const getCurrentProjectKey = () => {
@@ -18,13 +21,14 @@ const PageLayout: React.FC = () => {
   };
   const { Header, Content } = Layout;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
   const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
-  const [leftMenuData, setLeftMenuData] = useState<FileTree | folderKey>();
+  const [leftMenuData, setLeftMenuData] = useState<FileTree>([]);
   const [currentKey, setCurrentKey] = useState<string>(getCurrentProjectKey()); // 从 URL 获取初始值
   const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
@@ -55,6 +59,40 @@ const PageLayout: React.FC = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (!loading && projectsList.length > 0) {
+      const projectItems: MenuItem[] = !loading && projectsList.length > 0
+        ? projectsList.map(route => ({
+          key: route.project_key || '',
+          label: route.project_name,
+          type: 'item',
+        }))
+        : [{ key: 'loading', label: '加载中...', type: 'item' }];
+      projectItems.unshift({ key: 'home', label: '首页', type: 'item' });
+      setProjcetsItems(projectItems);
+    }
+    const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
+    if (currentProjectKey !== 'home') {
+      projectKey.current = currentProjectKey;
+      get_children_tree(currentProjectKey);
+    }
+  }, [loading, projectsList, location.pathname]);
+
+  useEffect(() => {
+    if (leftMenuData && leftMenuData.length > 0) {
+      const firstFile = getFirstFile(leftMenuData[0]);
+      if (firstFile) {
+        const fullPath = `${projectKey.current}/file?path=${encodeURIComponent(firstFile)}`;
+        dispatch(setSelectedKeys({
+          selectedKeys: [`/${projectKey.current}`],
+          openKeys: [projectKey.current],
+          currentPath: fullPath,
+        }));
+        navigate(fullPath);
+      }
+    }
+  }, [leftMenuData]);
+
   // 转换数据格式
   const transformData = (data: folderKey | FileTree): FileTree => {
     if (Array.isArray(data)) {
@@ -83,7 +121,20 @@ const PageLayout: React.FC = () => {
     })
   }
 
-  // 顶部导航菜单点击事件
+  const getFirstFile = (item: fileKey): string | null => {
+    if (item.type !== 'folder') {
+      return item.path;
+    } else {
+      for (const child of item.children || []) {
+        const result = getFirstFile(child);
+        if (result) {
+          return result;
+        }
+      }
+      return null;
+    }
+  }
+
   const handleMenuClick = ({ key }: { key: string }) => {
     const selectedRoute = projectItems.find(route => route?.key === key);
     setCurrentKey(key);
@@ -92,13 +143,11 @@ const PageLayout: React.FC = () => {
       if (key == 'home') {
         navigate('/home'); // 跳转到首页
       } else {
-        get_children_tree(key)
-        navigate(`/${selectedRoute.key}`); // 跳转到对应的项目页面
+        get_children_tree(key); // 更新左侧菜单的文件树
       }
     }
   };
 
-  // 退出登录处理
   const handleLogout = () => {
     localStorage.removeItem('username');
     navigate('/login');
@@ -114,25 +163,9 @@ const PageLayout: React.FC = () => {
     navigate('/setting');
   };
 
-
-  useEffect(() => {
-    if (!loading && projectsList.length > 0) {
-      const projectItems: MenuItem[] = !loading && projectsList.length > 0
-        ? projectsList.map(route => ({
-          key: route.project_key || '',
-          label: route.project_name,
-          type: 'item',
-        }))
-        : [{ key: 'loading', label: '加载中...', type: 'item' }];
-      projectItems.unshift({ key: 'home', label: '首页', type: 'item' });
-      setProjcetsItems(projectItems);
-    }
-    const currentProjectKey = getCurrentProjectKey();
-    if (currentProjectKey !== 'home') {
-      projectKey.current = currentProjectKey;
-      get_children_tree(currentProjectKey);
-    }
-  }, [loading, projectsList, location.pathname]);
+  const handleThemeChange = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light');
+  };
 
   // 用户操作菜单
   const menu = (
@@ -157,16 +190,28 @@ const PageLayout: React.FC = () => {
             <img src={logo} alt="logo" className="logo" />
           </div>
           <span className="title">知识库</span>
+          <SearchComponent />
         </div>
-        <Menu
-          theme={theme}
-          mode="horizontal"
-          selectedKeys={[currentKey]}
-          items={projectItems}
-          onClick={handleMenuClick}
-          style={{ width: '80%' }}
-        />
+        <div className="header-center">
+          <Menu
+            theme={theme}
+            mode="horizontal"
+            selectedKeys={[currentKey]}
+            items={projectItems}
+            onClick={handleMenuClick}
+            style={{ height: '49px' }}
+          />
+        </div>
         <div className="header-right">
+          <div className="theme-switch">
+          <Switch
+            checked={theme === 'dark'}
+            onChange={handleThemeChange}
+            checkedChildren="深色"
+            unCheckedChildren="浅色"
+          />
+          </div>
+          <Divider type="vertical" />
           <Dropdown overlay={menu} placement="bottomRight">
             <div className="user-info-trigger hoverable">
               <UserOutlined className="user-icon" />

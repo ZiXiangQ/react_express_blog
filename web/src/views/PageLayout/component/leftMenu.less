@@ -20,11 +20,8 @@
   .menu-search {
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
-
-    .ant-input-search {
-      .ant-input {
-        border-radius: 4px 0 0 4px;
-      }
+    .dark & {
+      border-color: #4e4f50;
     }
 
     .expand-button {
@@ -38,10 +35,17 @@
       border-left: none;
       cursor: pointer;
       transition: all 0.3s;
-      
+      .dark & {
+        background: #1f2129;
+        border-color: #1f2129;
+        color: var(--text-primary);
+      }
       &:hover {
         color: #1890ff;
         background: #f0f7ff;
+        .dark & {
+          background: #2d2d2d;
+        }
       }
     }
 
@@ -57,10 +61,17 @@
       cursor: pointer;
       transition: all 0.3s;
       border-radius: 0 4px 4px 0;
-      
+      .dark & {
+        background: #1f2129;
+        border-color: #1f2129;
+        color: var(--text-primary);
+      }
       &:hover {
         color: #1890ff;
         background: #f0f7ff;
+        .dark & {
+          background: #2d2d2d;
+        }
       }
 
       .anticon {
@@ -98,13 +109,25 @@
       cursor: pointer;
       transition: background-color 0.3s;
 
+      .dark & {
+        background: #1f2129;
+        border-color: #1f2129;
+        color: var(--text-primary);
+      }
+
       &:hover {
         background-color: #f5f5f5;
+        .dark & {
+          background: #2d2d2d;
+        }
       }
 
       &.selected {
         background-color: #e6f7ff;
         color: #1890ff;
+        .dark & {
+          background-color: #111b26;
+        }
       }
 
       .folder-item, .file-item {
