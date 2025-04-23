@@ -6,6 +6,7 @@ Description: description
 '''
 
 # Create your views here.
+from datetime import datetime
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from .indexing import get_base_dir_from_api, build_file_index
@@ -42,7 +43,9 @@ def search_files(request):
                 "filename": item["filename"],
                 "project": item["project"],
                 "route": item["route"],
-                "full_path": item["full_path"]
+                "full_path": item["full_path"],
+                "type": item["type"],
+                "update_time":datetime.fromtimestamp(item["update_time"]).strftime("%Y-%m-%d %H:%M:%S")
             })
             if len(results) >= 20:
                 break

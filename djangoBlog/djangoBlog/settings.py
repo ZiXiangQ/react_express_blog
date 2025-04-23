@@ -154,6 +154,14 @@ STATIC_URL = 'static/'
 
 FILE_HANDLE_API_BASE = "http://127.0.0.1:11055"
 
+# 项目根路径，比如 /Users/qiuzx/workspace/react_diango_blog
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# 添加 mockdata 静态目录
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'mockdata'),
+]
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',

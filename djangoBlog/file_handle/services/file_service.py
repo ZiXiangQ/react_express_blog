@@ -8,6 +8,7 @@ Description: description
 
 import hashlib
 import os
+import re
 from django.conf import settings
 import pandas as pd
 from django.http import FileResponse
@@ -21,6 +22,7 @@ import frontmatter  # 处理YAML front matter
 from datetime import datetime
 import xlrd  # 处理旧版 Excel 文件
 from file_handle.services.libreOffice_service import libreOfficeService
+import re
 
 
 class FileService:
@@ -34,6 +36,22 @@ class FileService:
         cache_key = f"{file_path}_{file_stat.st_mtime}"
         cache_name = hashlib.md5(cache_key.encode()).hexdigest() + '.pdf'
         return os.path.join(cache_dir, cache_name)
+    
+    @staticmethod
+    def fix_image_paths(md_content, md_file_path, base_url):
+        # 取出md文件所在的目录，比如 /Users/xxx/mockdata/接口规范/01测试
+        md_dir = os.path.dirname(md_file_path)
+        # 截掉本地路径开头，保留相对的 web 路径
+        # 你的mockdata在'/Users/qiuzx/workspace/react_diango_blog/mockdata'
+        relative_dir = os.path.relpath(md_dir, '/Users/qiuzx/workspace/react_diango_blog/mockdata')
+        def replace_src(match):
+            src_value = match.group(1)
+            if src_value.startswith('http'):
+                return match.group(0)
+            # 拼接成 http://xxx/mockdata/相对目录/resource/xxx.png
+            full_url = f"{base_url.rstrip('/')}/{relative_dir.rstrip('/')}/{src_value.lstrip('/')}"
+            return f'src="{full_url}"'
+        return re.sub(r'src="([^"]+)"', replace_src, md_content)
 
     @staticmethod
     def read_file_content(file_path, file_type):
@@ -173,8 +191,13 @@ class FileService:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     try:
                         post = frontmatter.load(f)
+                        fixed_content = FileService.fix_image_paths(
+                            post.content,
+                            file_path,
+                            'http://127.0.0.1:11055/mockdata'   # 你的静态访问前缀
+                        )
                         return {
-                            'content': post.content,  # 原始Markdown文本
+                            'content': fixed_content,  # 原始Markdown文本
                             'meta': post.metadata,    # Front Matter元数据
                             'type': 'md'              # 标记为Markdown类型
                         }
