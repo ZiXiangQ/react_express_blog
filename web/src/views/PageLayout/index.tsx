@@ -72,10 +72,11 @@ const PageLayout: React.FC = () => {
       setProjcetsItems(projectItems);
     }
     const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
-    if (currentProjectKey !== 'home') {
-      projectKey.current = currentProjectKey;
+    if (currentProjectKey !== 'home' && projectItems.some(item => item?.key === currentProjectKey)) {
       get_children_tree(currentProjectKey);
     }
+    projectKey.current = currentProjectKey;
+    setCurrentKey(currentProjectKey);// 设置当前项目key
   }, [loading, projectsList, location.pathname]);
 
   useEffect(() => {
@@ -221,7 +222,7 @@ const PageLayout: React.FC = () => {
         </div>
       </Header>
       <Layout className="main-layout">
-        {currentKey !== 'home' && leftMenuData && (
+        { projectItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
           <LeftMenu data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)} projectKey={projectKey.current} />
         )}
         <Layout>

@@ -10,9 +10,12 @@ import './index.less'; // 引入样式文件
 import BasicService from '@/services/api/base';
 import { LoginValues } from '@/types/base';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Login = () => {
     const navigate = useNavigate()
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const onFinish = (values: LoginValues) => {
         BasicService.login(values).then((res) => {
             if(res.code == 0) {
@@ -25,7 +28,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
-            <div className="form-container">
+            <div className={`form-container ${isDark ? 'dark' : ''}`}>
                 <Form
                     name="login"
                     onFinish={onFinish}

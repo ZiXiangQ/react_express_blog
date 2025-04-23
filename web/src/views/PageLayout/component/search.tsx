@@ -5,30 +5,27 @@
  * @Description: 搜索模块
  */
 import React, { useState, useRef } from 'react';
-import { Typography, Input, Empty, Spin, List, Space, Dropdown } from 'antd';
+import { Typography, Input, Empty, Spin, List, Space, Dropdown, Divider } from 'antd';
 import type { InputRef } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
 import Searchservice from '@/services/api/search';
-import { searchResult } from '@/types/search';
+import { searchResult, searchResultItem } from '@/types/search';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setSelectedKeys } from '@/store/slices/menuSlice';
 import './search.less';
+import { useTheme } from '@/contexts/ThemeContext';
+import FileIcon from '@/component/fileIcon';
+
 
 const { Text } = Typography;
 const { Search } = Input;
 
-interface SearchResult {
-  filename: string;
-  project: string;
-  route: string;
-  full_path: string;
-}
-
 const SearchComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const { theme } = useTheme(); // 🔥 直接拿到 'light' 或 'dark'
+  const isDark = theme === 'dark';
+  const [searchResults, setSearchResults] = useState<searchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false)
   const searchRef = useRef<InputRef>(null);
@@ -54,7 +51,7 @@ const SearchComponent = () => {
     }
   };
 
-  const handleResultClick = (result: SearchResult) => {
+  const handleResultClick = (result: searchResultItem) => {
     const menuPath = `/${result.project}`;
     const fullPath = `${menuPath}/file?path=${encodeURIComponent(result.full_path)}`;
     dispatch(setSelectedKeys({
@@ -69,7 +66,7 @@ const SearchComponent = () => {
   };
 
   const dropdownContent = (
-    <div className="search-results">
+    <div className={`search-results ${isDark ? 'dark' : ''}`}>
       <Spin spinning={loading}>
         {searchResults.length > 0 ? (
           <List
@@ -78,16 +75,20 @@ const SearchComponent = () => {
             dataSource={searchResults}
             renderItem={(item) => (
               <List.Item 
-                className="result-item"
+                className={`result-item ${isDark ? 'dark' : ''}`}
                 onClick={() => handleResultClick(item)}
               >
                 <Space align="start">
-                  <FileTextOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+                  <FileIcon type={item.type || ''} />
                   <div>
-                    <Text strong>{item.filename}</Text>
+                    <Text style={{fontSize:'12px'}} strong>{item.filename}</Text>
                     <br />
                     <Text type="secondary" style={{ fontSize: '12px' }}>
                       项目: {item.project}
+                    </Text>
+                    <Divider type="vertical" />
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                      更新时间: {item.update_time}
                     </Text>
                   </div>
                 </Space>

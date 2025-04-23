@@ -15,6 +15,8 @@ export interface searchResultItem {
     project:string;
     route:string;
     full_path:string;
+    type:string;
+    update_time:string;
 }
 
 export interface searchParams extends PostBodyModel {

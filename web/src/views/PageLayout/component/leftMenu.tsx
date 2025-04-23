@@ -4,7 +4,7 @@
  * @LastEditors: qiuzx
  * @Description: 左侧菜单
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Layout, Tooltip, Input, Space } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -27,12 +27,12 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
   const [filteredData, setFilteredData] = useState<fileKey[]>(data);
   const [isAllExpanded, setIsAllExpanded] = useState(false);
   const [flattenedItems, setFlattenedItems] = useState<FlattenedItem[]>([]);
-
-
+  const listRef = useRef<any>(null);
   const getSelectedKey = () => { // 获取选中项
     const params = new URLSearchParams(location.search);
     return params.get('path') || '';
   };
+  const selectedKey = getSelectedKey();
 
   const getParentPaths = (items: fileKey[], targetPath: string): string[] => { // 获取父级路径
     let parents: string[] = [];
@@ -89,6 +89,14 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
       setOpenKeys(prev => Array.from(new Set([...prev, ...parents])));
     }
   }, [location.search, data]);
+
+  useEffect(() => {
+    if (!selectedKey) return;
+    const index = flattenedItems.findIndex(item => item.key === selectedKey);
+    if (index !== -1 && listRef.current) {
+      listRef.current.scrollToItem(index, 'center');
+    }
+  }, [selectedKey, flattenedItems]);  
 
   useEffect(() => {  //更新扁平化树
     const flattened = flattenTree(filteredData);
@@ -228,9 +236,10 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
       )}
       <div className="virtual-list-container">
         <List
+          ref={listRef}
           height={window.innerHeight - 64}
           itemCount={flattenedItems.length}
-          itemSize={40}
+          itemSize={36}
           width="100%"
         >
           {Row}

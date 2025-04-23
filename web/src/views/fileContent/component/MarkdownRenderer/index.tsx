@@ -13,6 +13,7 @@ import remarkMath from 'remark-math';
 import 'highlight.js/styles/github.css';
 import 'katex/dist/katex.min.css';
 import './index.less';
+import rehypeRaw from 'rehype-raw'; // 👉 要加这个
 
 interface MarkdownRendererProps {
   content: string;
@@ -21,6 +22,15 @@ interface MarkdownRendererProps {
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) => {
   const markdownContent = typeof content === 'string' ? content : '';
+
+  const fixImagePaths = (content: string) => {
+    return content.replace(/<img src="([^"]+)"/g, (match, url) => {
+      const encodedUrl = encodeURI(url);
+      return match.replace(url, encodedUrl);
+    });
+  };
+
+  const fixedContent = fixImagePaths(markdownContent);
 
   return (
     <div className="markdown-container">
@@ -39,18 +49,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
 
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeHighlight,  [rehypeKatex, { 
+        rehypePlugins={[rehypeHighlight, [rehypeKatex, {
           strict: false, // 关闭严格模式
           trust: true,
           throwOnError: false, // 遇到错误时不抛出异常
           macros: { // 自定义宏
             "\\RR": "\\mathbb{R}"
           }
-        }]]}
+        }],rehypeRaw]}
         components={{
-          img: ({ ...props }) => (
-            <img {...props} loading="lazy" style={{ maxWidth: '100%' }} />
-          ),
+          img: ({ ...props }) => {
+            return <img {...props} loading="lazy" style={{ maxWidth: '80%' }} />
+          },
           table: ({ ...props }) => (
             <div className="table-container">
               <table {...props} />
@@ -58,7 +68,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
           ),
           code: ({ className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
-            return  match ? (
+            return match ? (
               <div className="code-block">
                 <div className="code-language">{match[1]}</div>
                 <code className={className} {...props}>
@@ -72,8 +82,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
             );
           }
         }}
+        skipHtml={false}  // <<< 👈 加上这个！！！
       >
-        {markdownContent}
+        {fixedContent}
       </ReactMarkdown>
     </div>
   );
