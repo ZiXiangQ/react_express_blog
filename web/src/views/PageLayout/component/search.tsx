@@ -57,7 +57,8 @@ const SearchComponent = () => {
     dispatch(setSelectedKeys({
       selectedKeys: [menuPath],
       openKeys: [result.project],
-      currentPath: fullPath
+      currentPath: fullPath,
+      triggeredBySearch: true,// 是否由搜索触发
     }));
     navigate(fullPath);
     if (searchRef.current) {

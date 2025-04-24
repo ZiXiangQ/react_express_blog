@@ -45,6 +45,10 @@ const FileContent: React.FC = () => {
           const excelResponse = response as excelDataType;
           setExcelContent({ content: excelResponse.data.content, meta: excelResponse.data.meta });
           setFileType('xlsx');
+        } else if (extension === 'txt' || extension === "etf") {
+          const mdResponse = response as mdDataType;
+          setFileContent(mdResponse.data.content);
+          setFileType('txt');
         } else {
           // setFileContent(response);
           setFileType(extension);
@@ -75,6 +79,8 @@ const FileContent: React.FC = () => {
     if (loading) {
       return <Spin size="large" />;
     }
+    console.log(fileType);
+    console.log(fileContent);
     switch (fileType) {
       case 'pdf':
       case 'doc':
@@ -94,6 +100,12 @@ const FileContent: React.FC = () => {
             {excelContent && <ExcelViewer excelContent={excelContent} />}
           </div>
         );
+      case 'png':
+        return <img src={fileContent} alt="png" />;
+      case 'txt':
+        return <pre style={{ whiteSpace: 'pre-wrap', padding: '1rem', background: '#f5f5f5' }}>
+          {fileContent}
+        </pre>
       default:
         return <div className="unsupported-type">不支持的文件类型: {fileType}</div>;
     }

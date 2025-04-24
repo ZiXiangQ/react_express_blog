@@ -39,19 +39,24 @@ class HttpClient {
     /**
      * 处理二进制响应（如 PDF 文件）
      */
-    private async handleBinaryResponse(promise: Promise<AxiosResponse<ArrayBuffer>>): Promise<Blob> {
+    async fetchBinaryFile(api: string, body?: PostBodyModel): Promise<string> {
+        const config = {
+            responseType: "arraybuffer" as const,
+        };
         try {
-            const rsp = await promise;
-            const contentType = rsp.headers["content-type"];
-            if (!contentType) {
-                throw new Error("Invalid binary response: Missing content type.");
-            }
-            return new Blob([rsp.data], { type: contentType });
+            const response = body
+                ? await axios.post(api, body, config)
+                : await axios.get(api, config);
+
+            const contentType = response.headers["content-type"] || "application/octet-stream";
+            const blob = new Blob([response.data], { type: contentType });
+            return URL.createObjectURL(blob);
         } catch (error) {
-            console.error("Binary Response Error:", error);
+            console.error("Binary File Fetch Error:", error);
             throw error;
         }
     }
+
 
     /**
      * 发送 GET 请求
@@ -88,6 +93,7 @@ class HttpClient {
             throw error;
         }
     }
+
 }
 
 const httpClient = new HttpClient();

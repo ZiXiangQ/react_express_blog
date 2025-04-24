@@ -32,8 +32,7 @@ const PageLayout: React.FC = () => {
   const [currentKey, setCurrentKey] = useState<string>(getCurrentProjectKey()); // 从 URL 获取初始值
   const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
-
-  const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys } = useAppSelector(state => state.menu);
+  const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys, triggeredBySearch: reduxTriggeredBySearch } = useAppSelector(state => state.menu);
 
   // 获取用户信息
   useEffect(() => {
@@ -81,6 +80,11 @@ const PageLayout: React.FC = () => {
 
   useEffect(() => {
     if (leftMenuData && leftMenuData.length > 0) {
+      console.log(reduxTriggeredBySearch);
+      if (reduxTriggeredBySearch) {
+        return;
+      }
+
       const firstFile = getFirstFile(leftMenuData[0]);
       if (firstFile) {
         const fullPath = `${projectKey.current}/file?path=${encodeURIComponent(firstFile)}`;
@@ -88,6 +92,7 @@ const PageLayout: React.FC = () => {
           selectedKeys: [`/${projectKey.current}`],
           openKeys: [projectKey.current],
           currentPath: fullPath,
+          triggeredBySearch: false,
         }));
         navigate(fullPath);
       }
@@ -213,7 +218,7 @@ const PageLayout: React.FC = () => {
           />
           </div>
           <Divider type="vertical" />
-          <Dropdown overlay={menu} placement="bottomRight">
+          <Dropdown overlay={menu} placement="bottomRight" >
             <div className="user-info-trigger hoverable">
               <UserOutlined className="user-icon" />
               <span className="user-name">{username || "游客"}</span>
@@ -223,7 +228,9 @@ const PageLayout: React.FC = () => {
       </Header>
       <Layout className="main-layout">
         { projectItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
-          <LeftMenu data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)} projectKey={projectKey.current} />
+          <LeftMenu
+            data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}
+            projectKey={projectKey.current} />
         )}
         <Layout>
           <Content className="content">

@@ -173,14 +173,13 @@ body {
 .ant-modal-close {
   color: var(--text-secondary, rgba(0, 0, 0, 0.65));
 }
-.ant-modal-footer {
+/* .ant-modal-footer {
     border-top: 1px solid var(--border-color, #d9d9d9);
-}
+} */
 
 /* 下拉菜单样式 */
 .ant-dropdown-menu {
   background-color: var(--card-bg, var(--bg-content-light));
-  border: 1px solid var(--border-color, #d9d9d9);
   box-shadow: var(--shadow-color, 0 2px 8px rgba(0, 0, 0, 0.15));
 }
 .ant-dropdown-menu-item {

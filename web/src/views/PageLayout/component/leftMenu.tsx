@@ -174,7 +174,6 @@ const LeftMenu: React.FC<LeftMenuProps> = ({ data, projectKey }) => {
               setOpenKeys(newOpenKeys);
               setIsAllExpanded(false);
             }}
-
           >
             <FileIcon type="folder" />
             <span className="item-label">{item.label}</span>

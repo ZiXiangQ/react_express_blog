@@ -10,12 +10,14 @@ interface MenuState {
   selectedKeys: string[];
   openKeys: string[];
   currentPath: string;
+  triggeredBySearch: boolean;
 }
 
 const initialState: MenuState = {
   selectedKeys: [],
   openKeys: [],
-  currentPath: ''
+  currentPath: '',
+  triggeredBySearch: false
 };
 
 export const menuSlice = createSlice({
@@ -26,11 +28,13 @@ export const menuSlice = createSlice({
       state.selectedKeys = action.payload.selectedKeys;
       state.openKeys = action.payload.openKeys;
       state.currentPath = action.payload.currentPath;
+      state.triggeredBySearch = action.payload.triggeredBySearch;
     },
     resetMenu: (state) => {
       state.selectedKeys = [];
       state.openKeys = [];
       state.currentPath = '';
+      state.triggeredBySearch = false;
     }
   }
 });

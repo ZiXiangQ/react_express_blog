@@ -39,7 +39,6 @@ class FileService:
     
     @staticmethod
     def fix_image_paths(md_content, md_file_path, base_url):
-        # 取出md文件所在的目录，比如 /Users/xxx/mockdata/接口规范/01测试
         md_dir = os.path.dirname(md_file_path)
         # 截掉本地路径开头，保留相对的 web 路径
         # 你的mockdata在'/Users/qiuzx/workspace/react_diango_blog/mockdata'
@@ -48,7 +47,6 @@ class FileService:
             src_value = match.group(1)
             if src_value.startswith('http'):
                 return match.group(0)
-            # 拼接成 http://xxx/mockdata/相对目录/resource/xxx.png
             full_url = f"{base_url.rstrip('/')}/{relative_dir.rstrip('/')}/{src_value.lstrip('/')}"
             return f'src="{full_url}"'
         return re.sub(r'src="([^"]+)"', replace_src, md_content)
@@ -203,6 +201,21 @@ class FileService:
                         }
                     except Exception as e:
                         raise APIException(f"Error parsing Markdown file: {str(e)}")
+            elif file_type == 'txt' or file_type == 'etf':
+                encodings = ['utf-8', 'gbk', 'iso-8859-1']
+                for enc in encodings:
+                    try:
+                        with open(file_path, 'r', encoding=enc) as f:
+                            return {
+                                'content': f.read(),
+                                'type': 'txt',
+                                'encoding': enc  # 可选：返回使用的编码
+                            }
+                    except UnicodeDecodeError:
+                        continue
+                raise ValueError("Failed to decode file using common encodings.")
+            elif file_type == 'png':
+                return FileResponse(open(file_path, 'rb'), content_type='image/png')
             else:
                 raise APIException((f"Unsupported file type: {file_type}"))
         except Exception as e:

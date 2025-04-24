@@ -33,11 +33,7 @@ def search_files(request):
     ensure_index_loaded()  # 确保索引已加载
     keyword = request.data.get('keyword', '').lower()
     results = []
-    print(f"[search] Searching for keyword: {keyword}")
-    print(f"[search] Current index size: {FILE_INDEX}")
-    
     for item in FILE_INDEX:
-        print(f"[search] Checking file: {item['filename']}")
         if keyword in item["filename"].lower():
             results.append({
                 "filename": item["filename"],

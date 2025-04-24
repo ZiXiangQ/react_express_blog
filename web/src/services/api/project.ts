@@ -68,6 +68,9 @@ class projectService {
     if (lowerCasePath.endsWith('.xlsx') || lowerCasePath.endsWith('.xls')) {
       return HttpClient.post<excelDataType, { file_path: string }>(api, param) as Promise<FileResponseType<T>>;
     }
+    if (lowerCasePath.endsWith('.png')) {
+      return HttpClient.fetchBinaryFile('/file_handle/file/read/', param) as Promise<FileResponseType<T>>;
+    }
     return HttpClient.post<fileContent, { file_path: string }>(api, param) as Promise<FileResponseType<T>>;
   }
 
