@@ -6,12 +6,6 @@
   /* 主要目的是提供一个明确的选择器 */
 }
 
-/* .dark & {
-  background: #1f2129;
-  border-color: #1f2129;
-  color: var(--text-primary);
-} */
-
 
 /* 深色主题变量 - Grafana 风格 */
 .app-container.dark {

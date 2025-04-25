@@ -11,7 +11,8 @@ import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import './index.less';
 import MarkdownRenderer from './component/MarkdownRenderer';
 import ExcelViewer from './component/ExcelViewer';
-import { mdContent, excelContent, mdDataType, excelDataType } from '@/types/project';
+import { mdContent, excelContent, mdDataType, excelDataType, xmindDataType, xmindContent } from '@/types/project';
+import XMindFlowComponent from './component/reactFlow';
 
 const FileContent: React.FC = () => {
   const location = useLocation();
@@ -19,6 +20,7 @@ const FileContent: React.FC = () => {
   const [fileType, setFileType] = useState<string>('');//文件类型
   const [mdContent, setMdContent] = useState<mdContent>();//md  
   const [fileContent, setFileContent] = useState<string>('');//pdf url
+  const [xmindContent, setXmindContent] = useState<xmindContent[]>();//xmind
   const [excelContent, setExcelContent] = useState<excelContent>();//excel
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
@@ -49,6 +51,11 @@ const FileContent: React.FC = () => {
           const mdResponse = response as mdDataType;
           setFileContent(mdResponse.data.content);
           setFileType('txt');
+        } else if (extension === 'xmind') {
+          const xmindResponse = response as xmindDataType;
+          console.log(xmindResponse.data);
+          setXmindContent(xmindResponse.data);
+          setFileType('xmind');
         } else {
           // setFileContent(response);
           setFileType(extension);
@@ -79,8 +86,7 @@ const FileContent: React.FC = () => {
     if (loading) {
       return <Spin size="large" />;
     }
-    console.log(fileType);
-    console.log(fileContent);
+    console.log(xmindContent);
     switch (fileType) {
       case 'pdf':
       case 'doc':
@@ -106,6 +112,8 @@ const FileContent: React.FC = () => {
         return <pre style={{ whiteSpace: 'pre-wrap', padding: '1rem', background: '#f5f5f5' }}>
           {fileContent}
         </pre>
+      case 'xmind':
+        return <XMindFlowComponent contentData={xmindContent} />;
       default:
         return <div className="unsupported-type">不支持的文件类型: {fileType}</div>;
     }

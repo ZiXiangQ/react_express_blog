@@ -98,3 +98,14 @@ export interface SheetData {
     }>;
     rows: string[][];
 }
+
+export interface xmindDataType extends RspModel { //xmind文件内容
+    data: xmindContent[];
+}
+
+export interface xmindContent {
+    type?: string;
+    structure?: string;
+    title: string;
+    topics?: xmindContent[];
+}

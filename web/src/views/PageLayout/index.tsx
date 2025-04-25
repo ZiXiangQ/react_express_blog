@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
 import { Divider, Dropdown, Layout, Menu, message, Switch } from 'antd';
@@ -15,27 +15,39 @@ import LeftMenu from './component/leftMenu';
 import SearchComponent from './component/search';
 
 const PageLayout: React.FC = () => {
-  const getCurrentProjectKey = () => {
-    const pathSegments = decodeURIComponent(location.pathname).split('/');
-    return pathSegments[1] === 'home' ? 'home' : pathSegments[1];
-  };
   const { Header, Content } = Layout;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  
   const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
-  const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
+  // const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
   const [leftMenuData, setLeftMenuData] = useState<FileTree>([]);
-  const [currentKey, setCurrentKey] = useState<string>(getCurrentProjectKey()); // 从 URL 获取初始值
-  const projectKey = useRef<string>("");
   type MenuItem = GetProp<MenuProps, 'items'>[number];
   const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys, triggeredBySearch: reduxTriggeredBySearch } = useAppSelector(state => state.menu);
 
-  // 获取用户信息
-  useEffect(() => {
+  const getCurrentProjectKey = () => {
+    const pathSegments = decodeURIComponent(location.pathname).split('/');
+    return pathSegments[1] === 'home' ? 'home' : pathSegments[1];
+  };
+  const [currentKey, setCurrentKey] = useState<string>(getCurrentProjectKey()); // 从 URL 获取初始值
+  const projectKey = useRef<string>("");
+
+  // 从项目列表生成 MenuItems
+  const projectMenuItems = useMemo(() => {  
+    const items = projectsList.map(project => ({
+      key: project.project_key,
+      label: project.project_name,
+      type: 'item',
+    }));
+    items.unshift({ key: 'home', label: '首页', type: 'item' });
+    return items;
+  }, [projectsList]);
+
+  useEffect(() => { //初始化用户信息
     const storeUsername = localStorage.getItem('username');
     if (storeUsername) {
       setUsername(storeUsername);
@@ -48,8 +60,7 @@ const PageLayout: React.FC = () => {
     }
   }, [reduxSelectedKeys, reduxOpenKeys])
 
-  // 获取项目列表
-  useEffect(() => {
+  useEffect(() => { //初始化项目列表
     ProjectService.get_all_projects().then((rsp: projectList) => {
       if (rsp.code == 0) {
         setProjectsList(rsp.data);
@@ -59,32 +70,30 @@ const PageLayout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!loading && projectsList.length > 0) {
-      const projectItems: MenuItem[] = !loading && projectsList.length > 0
-        ? projectsList.map(route => ({
-          key: route.project_key || '',
-          label: route.project_name,
-          type: 'item',
-        }))
-        : [{ key: 'loading', label: '加载中...', type: 'item' }];
-      projectItems.unshift({ key: 'home', label: '首页', type: 'item' });
-      setProjcetsItems(projectItems);
-    }
     const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
-    if (currentProjectKey !== 'home' && projectItems.some(item => item?.key === currentProjectKey)) {
-      get_children_tree(currentProjectKey);
+    if (!loading && projectsList.some(p => p.project_key === currentProjectKey)) {
+      setCurrentKey(currentProjectKey);
+      projectKey.current = currentProjectKey;
+      if (currentProjectKey !== 'home')   get_children_tree(currentProjectKey);
     }
-    projectKey.current = currentProjectKey;
-    setCurrentKey(currentProjectKey);// 设置当前项目key
   }, [loading, projectsList, location.pathname]);
+
+
+  const get_children_tree = (currentKey: string) => {
+    ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
+      if (rsp.code == 0) {
+        setLeftMenuData(transformData(rsp.data));
+      } else {
+        message.error(rsp.message);
+      }
+    })
+  }
 
   useEffect(() => {
     if (leftMenuData && leftMenuData.length > 0) {
-      console.log(reduxTriggeredBySearch);
       if (reduxTriggeredBySearch) {
         return;
       }
-
       const firstFile = getFirstFile(leftMenuData[0]);
       if (firstFile) {
         const fullPath = `${projectKey.current}/file?path=${encodeURIComponent(firstFile)}`;
@@ -99,8 +108,7 @@ const PageLayout: React.FC = () => {
     }
   }, [leftMenuData]);
 
-  // 转换数据格式
-  const transformData = (data: folderKey | FileTree): FileTree => {
+  const transformData = (data: folderKey | FileTree): FileTree => {  // 转换数据格式
     if (Array.isArray(data)) {
       return data as FileTree;
     }
@@ -115,19 +123,7 @@ const PageLayout: React.FC = () => {
     });
   };
 
-  const get_children_tree = (currentKey: string) => {
-    ProjectService.get_children_tree({ "project_key": currentKey }).then((rsp: childProjectItem) => {
-      if (rsp.code == 0) {
-        const responseData = rsp.data;
-        const transformedData = transformData(responseData);
-        setLeftMenuData(transformedData);
-      } else {
-        message.error(rsp.message);
-      }
-    })
-  }
-
-  const getFirstFile = (item: fileKey): string | null => {
+  const getFirstFile = (item: fileKey): string | null => { // 获取第一个文件
     if (item.type !== 'folder') {
       return item.path;
     } else {
@@ -142,7 +138,7 @@ const PageLayout: React.FC = () => {
   }
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    const selectedRoute = projectItems.find(route => route?.key === key);
+    const selectedRoute = projectMenuItems.find(route => route?.key === key);
     setCurrentKey(key);
     if (selectedRoute) {
       projectKey.current = key;
@@ -154,21 +150,6 @@ const PageLayout: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('username');
-    navigate('/login');
-  };
-
-  // 用户管理页面
-  const handleUserManagement = () => {
-    navigate('/userHandle');
-  };
-
-  // 系统设置页面
-  const handleSetting = () => {
-    navigate('/setting');
-  };
-
   const handleThemeChange = (checked: boolean) => {
     setTheme(checked ? 'dark' : 'light');
   };
@@ -176,15 +157,12 @@ const PageLayout: React.FC = () => {
   // 用户操作菜单
   const menu = (
     <Menu>
-      <Menu.Item key="1" onClick={handleUserManagement}>
-        用户管理
-      </Menu.Item>
-      <Menu.Item key="2" onClick={handleSetting}>
-        系统设置
-      </Menu.Item>
-      <Menu.Item key="3" onClick={handleLogout}>
-        登出
-      </Menu.Item>
+      <Menu.Item key="1" onClick={() => navigate('/userHandle')}>用户管理</Menu.Item>
+      <Menu.Item key="2" onClick={() => navigate('/setting')}>系统设置</Menu.Item>
+      <Menu.Item key="3" onClick={() => {
+        localStorage.removeItem('username');
+        navigate('/login');
+      }}>登出</Menu.Item>
     </Menu>
   );
 
@@ -203,9 +181,9 @@ const PageLayout: React.FC = () => {
             theme={theme}
             mode="horizontal"
             selectedKeys={[currentKey]}
-            items={projectItems}
+            items={projectMenuItems as MenuItem[]}
             onClick={handleMenuClick}
-            style={{ height: '49px' }}
+            style={{ height: '49px', width:"50%" }}
           />
         </div>
         <div className="header-right">
@@ -226,8 +204,9 @@ const PageLayout: React.FC = () => {
           </Dropdown>
         </div>
       </Header>
+
       <Layout className="main-layout">
-        { projectItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
+        { projectMenuItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
           <LeftMenu
             data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}
             projectKey={projectKey.current} />
