@@ -104,11 +104,25 @@ body {
   background-color: transparent;
 }
 
-
+.ant-layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  padding: 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  .dark & {
+    border-color: #4e4f50;
+  }
+}
 
 .ant-layout-sider {
   background-color: var(--card-bg, var(--bg-content-light));
-  border-right: 1px solid var(--border-color, #d9d9d9);
+  /* border-right: 1px solid var(--border-color, #d9d9d9); */
+}
+.ant-layout-header {
+  background-color: var(--card-bg, var(--bg-content-light));
 }
 
 .ant-layout-content {

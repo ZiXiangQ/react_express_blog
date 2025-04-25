@@ -2,26 +2,6 @@
 body {
   font-family: 'Arial', sans-serif;
 }
-
-.ant-layout-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 64px;
-  padding: 0 20px;
-  background: #fff;
-  border-bottom: 1px solid #e8e8e8;
-  .dark & {
-    border-color: #4e4f50;
-  }
-}
-
-.ant-layout-content {
-  background: #f0f2f5;
-  .dark & {
-    background: #1f2129;
-  }
-}
 /* 容器样式 */
 .arrow-container {
   display: flex;
@@ -29,16 +9,6 @@ body {
   align-items: center;
   height: calc(100vh - 64px);
   background: #f0f0f0;
-}
-
-
-
-/* 容器样式 */
-.arrow-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
 }
 
 .arrow-body {
@@ -53,21 +23,7 @@ body {
 }
 
 
-/* 三角箭头 */
-.arrow-body::after {
-  content:"";
-  position:absolute;
-  /* 这里要和下面一起修改 */
-  right: -12px;
-  top: 0;
-  width: 0;
-  height: 0;
-  /* 这里修改箭头的高度，这里建议是上面的24px的一半，同时要修改right：-12px的值 */
-  border: 12px solid transparent;
-  /* 这里可以修改箭头的横向长度，以及颜色 */
-  border-left-width: 20px;
-  border-left-color: skyblue;
-} 
+
 /* 流动的线条的body */
 .flow-body {
   position: relative;

@@ -2,22 +2,32 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  width: 100%;
-  margin: 40px 20px;
+  width: 95%;
+  margin: 40px auto;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: var(--text-color);
+  // background-color: var(--bg-color);
+  transition: background 0.3s ease;
+
   &.light {
     --bg-color: #ffffff;
-    --text-color: #333;
+    --text-color: #2c3e50;
     --code-bg: #f6f8fa;
     --border-color: #eaecef;
+    --table-header-bg: #f6f8fa;
+    --table-row-bg: #fff;
+    --text-secondary: #7f8c8d;
   }
-  
+
   &.dark {
-    --bg-color: #1e1e1e;
+    // --bg-color: #1e1e1e;
     --text-color: #e0e0e0;
     --code-bg: #2d2d2d;
     --border-color: #444;
+    --table-header-bg: #333;
+    --table-row-bg: #292929;
+    --text-secondary: #999;
   }
 
   .markdown-meta {
@@ -25,9 +35,9 @@
     padding-bottom: 1em;
     border-bottom: 1px solid var(--border-color);
 
-    h1 {
-      margin: 0 0 0.5em;
-      color: var(--heading-color);
+    h1, h2, h3 {
+      color: var(--text-color);
+      margin-bottom: 0.5em;
     }
 
     .date {
@@ -54,7 +64,7 @@
     top: 80px;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
-    
+
     .ant-anchor {
       padding-left: 8px;
     }
@@ -65,80 +75,10 @@
     min-width: 0;
   }
 
-  .code-block-wrapper {
-    position: relative;
-    margin: 16px 0;
-    
-    .code-block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 8px;
-      background: var(--code-bg);
-      border-radius: 4px 4px 0 0;
-      
-      .code-language {
-        font-size: 12px;
-        color: var(--text-color);
-        opacity: 0.7;
-      }
-      
-      .copy-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--text-color);
-        
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-    }
-  }
-
   .table-container {
     overflow-x: auto;
     margin: 16px 0;
-    
-    table {
-      min-width: 100%;
-      
-      th, td {
-        padding: 12px;
-        border: 1px solid var(--border-color);
-      }
-      
-      th {
-        background: var(--code-bg);
-      }
-    }
-  }
 
-    // 代码块
-    pre {
-      margin: 1em 0;
-      padding: 16px;
-      background-color: var(--code-bg);
-      border-radius: 6px;
-      overflow: auto;
-  
-      code {
-        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-        font-size: 14px;
-        line-height: 1.4;
-      }
-    }
-  
-    // 行内代码
-    code {
-      padding: 0.2em 0.4em;
-      margin: 0;
-      font-size: 85%;
-      background-color: var(--code-bg);
-      border-radius: 3px;
-    }
-  
-    // 表格
     table {
       width: 100%;
       border-collapse: collapse;
@@ -158,36 +98,113 @@
         background-color: var(--table-row-bg);
       }
     }
-  
-    // 引用
-    blockquote {
-      margin: 1em 0;
-      padding: 0 1em;
-      color: var(--text-secondary);
-      border-left: 4px solid var(--border-color);
-    }
-  
-    // 水平线
-    hr {
-      margin: 2em 0;
-      border: none;
-      border-top: 1px solid var(--border-color);
-    }
-  
-    // 图片
-    img {
-      max-width: 100%;
-      height: auto;
-      margin: 1em 0;
-      border-radius: 4px;
-    }
+  }
 
+  // =========================
+  // 优化后的 Markdown 样式
+  // =========================
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 1.5em 0 0.5em;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  p {
+    margin: 1em 0;
+  }
+
+  ul, ol {
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+
+  li {
+    line-height: 1.8;
+  }
+
+  a {
+    color: #1677ff;
+    text-decoration: underline;
+
+    &:hover {
+      color: #4096ff;
+    }
+  }
+
+  // 引用块
+  blockquote {
+    margin: 1.5em 0;
+    padding: 0.5em 1em;
+    color: var(--text-secondary);
+    background-color: rgba(127, 127, 127, 0.05);
+    border-left: 4px solid var(--border-color);
+  }
+
+  // 分割线
+  hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  // 图片
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  // 行内代码
+  code {
+    padding: 0.2em 0.4em;
+    font-size: 90%;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    background-color: var(--code-bg);
+    border-radius: 4px;
+    color: #c7254e;
+  }
+
+  // 代码块
+  pre {
+    margin: 1.5em 0;
+    padding: 16px;
+    background-color: var(--code-bg);
+    border-radius: 8px;
+    overflow: auto;
+
+    code {
+      display: block;
+      color: inherit;
+      background: none;
+      padding: 0;
+    }
+  }
+
+  // 显示语言标签
+  .code-block {
+    position: relative;
+    margin: 1.5em 0;
+
+    .code-language {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background-color: var(--border-color);
+      border-radius: 0 6px 0 6px;
+    }
+  }
 }
 
 @media (max-width: 768px) {
   .markdown-content {
     flex-direction: column;
-    
+
     .toc-sidebar {
       position: static !important;
       width: 100% !important;

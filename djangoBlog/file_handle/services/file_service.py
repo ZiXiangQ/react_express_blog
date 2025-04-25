@@ -9,6 +9,7 @@ Description: description
 import hashlib
 import os
 import re
+import zipfile
 from django.conf import settings
 import pandas as pd
 from django.http import FileResponse
@@ -23,6 +24,9 @@ from datetime import datetime
 import xlrd  # 处理旧版 Excel 文件
 from file_handle.services.libreOffice_service import libreOfficeService
 import re
+from xml.etree import ElementTree as ET
+import json
+from xmindparser import xmind_to_dict
 
 
 class FileService:
@@ -214,9 +218,12 @@ class FileService:
                     except UnicodeDecodeError:
                         continue
                 raise ValueError("Failed to decode file using common encodings.")
-            elif file_type == 'png':
+            elif file_type == 'png' or file_type == 'jpg':
                 return FileResponse(open(file_path, 'rb'), content_type='image/png')
+            elif file_type == 'xmind':
+                data = xmind_to_dict(file_path)
+                return data
             else:
-                raise APIException((f"Unsupported file type: {file_type}"))
+                raise APIException(f"Error reading xmind file: {str(e)}")   
         except Exception as e:
             raise APIException(f"Error reading file: {str(e)}")

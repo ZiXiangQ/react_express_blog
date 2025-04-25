@@ -1,125 +1,66 @@
-/*
- * @Author: qiuzx
- * @Date: 2025-01-08 10:50:55
- * @LastEditors: qiuzx
- * @Description: description
- */
-import React, { useState } from 'react';
-import { Typography, Input, Empty, Spin, List, Space } from 'antd';
-import { SearchOutlined, FileTextOutlined } from '@ant-design/icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import './index.less';
-import Searchservice from '@/services/api/search';
-import { searchResult } from '@/types/search';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setSelectedKeys } from '@/store/slices/menuSlice';
+import React from "react";
+import { Card, Input, Typography, Row, Col, Button, Space } from "antd";
+import { SearchOutlined, BookOutlined, ClockCircleOutlined, RocketOutlined } from "@ant-design/icons";
 
-const { Paragraph, Text } = Typography;
-const { Search } = Input;
+const { Title, Text } = Typography;
 
-interface SearchResult {
-  filename: string;
-  project: string;
-  route: string;
-  full_path: string;
-}
-
-const Home = () => {
-  const { theme } = useTheme();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchVisible, setSearchVisible] = useState(false);
-
-  const handleSearch = async (keyword: string) => {
-    if (!keyword.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const response:searchResult = await Searchservice.search_files(keyword);
-      if (response.code == 0) {
-        setSearchResults(response.data);
-        setSearchVisible(true);
-      }
-    } catch (error) {
-      console.error('搜索失败:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResultClick = (result: SearchResult) => {
-    const menuPath = `/${result.project}`;
-    const fullPath = `${menuPath}/file?path=${encodeURIComponent(result.full_path)}`;
-    dispatch(setSelectedKeys({
-      selectedKeys: [menuPath],
-      openKeys: [result.project],
-      currentPath: fullPath
-    }));
-    navigate(fullPath);
-  };
-
+export default function KnowledgeBaseHome() {
   return (
-    <div className={`home-container ${theme}`}>
-      <div className="search-section">
-        {/* <Title level={2}>欢迎访问知识文档</Title> */}
-        <Paragraph style={{ fontSize: '18px', maxWidth: '600px', margin: '20px auto' }}>
-          {/* 这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。 */}
-        </Paragraph>
-        
-        <div className="search-box">
-          <Search
-            placeholder="搜索文档..."
-            allowClear
-            enterButton={<SearchOutlined />}
-            size="large"
-            onSearch={handleSearch}
-            style={{ maxWidth: '600px', width: '100%' }}
-          />
-        </div>
-
-        {searchVisible && (
-          <div className="search-results">
-            <Spin spinning={loading}>
-              {searchResults.length > 0 ? (
-                <List
-                  className="result-list"
-                  itemLayout="horizontal"
-                  dataSource={searchResults}
-                  renderItem={(item) => (
-                    <List.Item 
-                      className="result-item"
-                      onClick={() => handleResultClick(item)}
-                    >
-                      <Space align="start">
-                        <FileTextOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
-                        <div>
-                          <Text strong>{item.filename}</Text>
-                          <br />
-                          <Text type="secondary" style={{ fontSize: '12px' }}>
-                            项目: {item.project}
-                          </Text>
-                        </div>
-                      </Space>
-                    </List.Item>
-                  )}
-                />
-              ) : (
-                <Empty 
-                  description="未找到相关文档" 
-                  style={{ padding: '40px 0' }}
-                />
-              )}
-            </Spin>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* 欢迎信息与搜索栏 */}
+        <Card className="mb-6 shadow-lg rounded-2xl p-8 bg-white text-center">
+          <Title level={2}>欢迎访问知识文档</Title>
+          <Text className="text-gray-500">
+            这里是我们的知识文档中心。您可以在这里找到各种技术文档、使用指南和常见问题解答，帮助您更好地理解和使用我们的产品。
+          </Text>
+          <div className="mt-6 max-w-xl mx-auto">
+            <Input size="large" placeholder="搜索文档..." prefix={<SearchOutlined />} className="rounded-full" />
           </div>
-        )}
+        </Card>
+
+        {/* 内容区域 */}
+        <Row gutter={[24, 24]}>
+          {/* 推荐文档 */}
+          <Col xs={24} md={12}>
+            <Card className="shadow-md rounded-2xl p-6 hover:shadow-xl transition duration-300">
+              <Title level={4}><BookOutlined className="mr-2" />推荐文档</Title>
+              <Space direction="vertical" className="mt-4 w-full">
+                <Button type="link" className="text-left">🚀 如何快速上手本系统</Button>
+                <Button type="link" className="text-left">📚 产品使用指南合集</Button>
+                <Button type="link" className="text-left">🔧 常见问题汇总</Button>
+              </Space>
+            </Card>
+          </Col>
+
+          {/* 最近更新 */}
+          <Col xs={24} md={12}>
+            <Card className="shadow-md rounded-2xl p-6 hover:shadow-xl transition duration-300">
+              <Title level={4}><ClockCircleOutlined className="mr-2" />最近更新</Title>
+              <ul className="mt-4 space-y-2 text-gray-600">
+                <li>2025-04-25 - 新增 XMind 导入功能文档</li>
+                <li>2025-04-20 - 更新 数据同步机制说明</li>
+                <li>2025-04-15 - 修复 FAQ 文档中的错误</li>
+              </ul>
+            </Card>
+          </Col>
+
+          {/* 快速上手 */}
+          <Col span={24}>
+            <Card className="shadow-md rounded-2xl p-6 mt-4 hover:shadow-xl transition duration-300">
+              <Title level={4}><RocketOutlined className="mr-2" />快速上手</Title>
+              <Text className="block mb-2 text-gray-500">
+                如果您是第一次使用，建议您从以下文档开始：
+              </Text>
+              <Space direction="horizontal" size="large">
+                <Button type="primary" shape="round">使用流程概览</Button>
+                <Button type="default" shape="round">新手指南</Button>
+                <Button type="default" shape="round">常见问题</Button>
+              </Space>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </div>
   );
-};
-
-export default Home;
+}
