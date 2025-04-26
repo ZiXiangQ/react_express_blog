@@ -5,6 +5,17 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  .theme-icon {
+    width: 30px;
+    height: 20px;
+    margin-top: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .theme-switch:hover .theme-icon {
+    transform: rotate(30deg);//
+  }
+  
   &.light {
     background-color: #f0f2f5;
     
@@ -26,18 +37,14 @@
         width: 35%;
         .logo-container {
           height: 50px;
-          padding: 5px;
-          width: 80px;
+          padding: 15px;
+          width: 60px;
           display: flex;
           justify-content: flex-start;
           align-items: center;
-          border-bottom: 1px solid #f0f0f0;
-          background: #fff;
           .logo {
-            height: 38px;
-            width: 38px;
-            border-radius: 20%;
-            transition: all 0.3s;
+            height: 55px;
+            width: 55px;
           }
         }
         .title {
@@ -113,19 +120,15 @@
         align-items: center;
         width: 35%;
         .logo-container {
-          height: 49px;
-          padding: 5px;
-          width: 80px;
+          height: 50px;
+          padding: 15px;
+          width: 60px;
           display: flex;
           justify-content: flex-start;
           align-items: center;
-          border-bottom: 1px solid #1f2129;
-          background: #1f2129;
           .logo {
-            height: 38px;
-            width: 38px;
-            border-radius: 20%;
-            transition: all 0.3s;
+            height: 55px;
+            width: 55px;
           }
         }
         .title {

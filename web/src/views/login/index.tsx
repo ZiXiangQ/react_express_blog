@@ -21,8 +21,7 @@ const Login = () => {
             if(res.code == 0) {
                 message.success('登录成功');
                 navigate("/home")
-                localStorage.setItem('username', values.username)
-            }
+                localStorage.setItem('username', values.username)            }
         });
     };
 

@@ -1,0 +1,12 @@
+<svg viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 横向闪电形状 -->
+  <polygon points="20,60 100,20 90,50 160,20 140,70 170,70 80,110 100,80 50,100" fill="#FFD93B" stroke="#2F2F2F" stroke-width="4" />
+
+  <!-- 红脸颊 -->
+  <circle cx="70" cy="85" r="6" fill="#FF4F4F" />
+  <circle cx="140" cy="55" r="6" fill="#FF4F4F" />
+
+  <!-- 眼睛 -->
+  <circle cx="85" cy="70" r="5" fill="#2F2F2F" />
+  <circle cx="120" cy="50" r="5" fill="#2F2F2F" />
+</svg>

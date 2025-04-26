@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import type { GetProp, MenuProps } from 'antd';
-import { Divider, Dropdown, Layout, Menu, message, Switch } from 'antd';
+import { Divider, Dropdown, Layout, Menu, message } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ProjectService from '@/services/api/project';
 import { childProjectItem, folderKey, projectItem, projectList, FileTree, fileKey } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
-import logo from '@/assets/logo.svg';
+import logo from '@/assets/logopika.svg';
 import { useAppSelector } from '@/store/hooks';
 import { useDispatch } from 'react-redux';
 import { setSelectedKeys } from '@/store/slices/menuSlice';
@@ -20,11 +20,9 @@ const PageLayout: React.FC = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  
   const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
   const [projectsList, setProjectsList] = useState<projectItem[]>([]);
-  // const [projectItems, setProjcetsItems] = useState<MenuItem[]>([]);
   const [leftMenuData, setLeftMenuData] = useState<FileTree>([]);
   type MenuItem = GetProp<MenuProps, 'items'>[number];
   const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys, triggeredBySearch: reduxTriggeredBySearch } = useAppSelector(state => state.menu);
@@ -37,7 +35,7 @@ const PageLayout: React.FC = () => {
   const projectKey = useRef<string>("");
 
   // 从项目列表生成 MenuItems
-  const projectMenuItems = useMemo(() => {  
+  const projectMenuItems = useMemo(() => {
     const items = projectsList.map(project => ({
       key: project.project_key,
       label: project.project_name,
@@ -74,7 +72,7 @@ const PageLayout: React.FC = () => {
     if (!loading && projectsList.some(p => p.project_key === currentProjectKey)) {
       setCurrentKey(currentProjectKey);
       projectKey.current = currentProjectKey;
-      if (currentProjectKey !== 'home')   get_children_tree(currentProjectKey);
+      if (currentProjectKey !== 'home') get_children_tree(currentProjectKey);
     }
   }, [loading, projectsList, location.pathname]);
 
@@ -150,8 +148,9 @@ const PageLayout: React.FC = () => {
     }
   };
 
-  const handleThemeChange = (checked: boolean) => {
-    setTheme(checked ? 'dark' : 'light');
+  const handleThemeChange = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // 用户操作菜单
@@ -162,6 +161,14 @@ const PageLayout: React.FC = () => {
       <Menu.Item key="3" onClick={() => {
         localStorage.removeItem('username');
         navigate('/login');
+        message.success('登出成功');
+        //关闭侧边栏
+        dispatch(setSelectedKeys({
+          selectedKeys: [],
+          openKeys: [],
+          currentPath: '',
+          triggeredBySearch: false,
+        }));
       }}>登出</Menu.Item>
     </Menu>
   );
@@ -173,7 +180,7 @@ const PageLayout: React.FC = () => {
           <div className="logo-container">
             <img src={logo} alt="logo" className="logo" />
           </div>
-          <span className="title">知识库</span>
+          <span className="title">文渊阁</span>
           <SearchComponent />
         </div>
         <div className="header-center">
@@ -183,17 +190,18 @@ const PageLayout: React.FC = () => {
             selectedKeys={[currentKey]}
             items={projectMenuItems as MenuItem[]}
             onClick={handleMenuClick}
-            style={{ height: '49px', width:"50%" }}
+            style={{ height: '49px', width: "50%" }}
           />
         </div>
         <div className="header-right">
           <div className="theme-switch">
-          <Switch
-            checked={theme === 'dark'}
-            onChange={handleThemeChange}
-            checkedChildren="深色"
-            unCheckedChildren="浅色"
-          />
+            <div className="theme-switch" onClick={handleThemeChange} style={{ cursor: 'pointer' }}>
+              <img
+                src={theme === 'dark' ? '/moon.svg' : '/sun.svg'}
+                alt="theme-icon"
+                className="theme-icon"
+              />
+            </div>
           </div>
           <Divider type="vertical" />
           <Dropdown overlay={menu} placement="bottomRight" >
@@ -206,7 +214,7 @@ const PageLayout: React.FC = () => {
       </Header>
 
       <Layout className="main-layout">
-        { projectMenuItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
+        {projectMenuItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
           <LeftMenu
             data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}
             projectKey={projectKey.current} />

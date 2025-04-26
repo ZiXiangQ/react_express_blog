@@ -56,7 +56,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, meta }) =>
           macros: { // 自定义宏
             "\\RR": "\\mathbb{R}"
           }
-        }],rehypeRaw]}
+        }], rehypeRaw]}
         components={{
           img: ({ ...props }) => {
             return <img {...props} loading="lazy" style={{ maxWidth: '80%' }} />

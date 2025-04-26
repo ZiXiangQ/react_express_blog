@@ -8,38 +8,19 @@
   position: fixed;           /* 固定位置，确保满屏 */
   top: 0;                    /* 从顶部开始 */
   left: 0;                   /* 从左侧开始 */
-  background: url('../../assets/loginbg.png') no-repeat center center;
+  background: url('../../assets/homepage.jpg') no-repeat center center;
   background-size: cover; /* 背景图片大小 */
   .form-container {
+    background-color: rgba(255, 255, 255, 0.4);
     padding: 60px 40px;
-    background-color: rgba(233, 232, 232, 0.5);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(119, 119, 119, 0.5);
     border-radius: 8px;
     width: 400px;
     max-width: 100%;
-    margin-right: 350px;
-    &.dark{
+    margin-right: 180px;
+  
+    &.dark {
       background-color: #2d2c2c;
     }
   }
-
-  h2 {
-    justify-content: center;
-    color: #9face6;
-    margin-bottom: 20px; /* 增加标题与表单之间的间隙 */
-  }
-
-  .ant-form-item {
-    margin-bottom: 16px; /* 设置表单项之间的间隙 */
-  }
-
-  margin-right:100px ;                  /* 确保在小屏幕下的适配 */
-}
-
-h2 {
-  margin-bottom: 20px; /* 增加标题与表单之间的间隙 */
-}
-
-.ant-form-item {
-  margin-bottom: 16px; /* 设置表单项之间的间隙 */
 }
