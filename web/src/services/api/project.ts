@@ -5,7 +5,7 @@
  * @Description: description
  */
 import HttpClient from "@/services/httpClient";
-import { childProjectItem, fileContent, projectList, projectItem, sysPath, mdDataType, excelDataType, xmindDataType } from "@/types/project";
+import { childProjectItem, fileContent, projectList, projectItem, sysPath, mdDataType, excelDataType } from "@/types/project";
 import { RspModel, PostBodyModel } from "@/services/httpClient";
 
 // 定义文件响应类型的联合类型
@@ -15,8 +15,6 @@ type FileResponseType<T> = T extends string
   ? mdDataType
   : T extends excelDataType
   ? excelDataType
-  : T extends xmindDataType
-  ? xmindDataType
   : fileContent;
 
 class projectService {
@@ -56,7 +54,7 @@ class projectService {
     return HttpClient.post<childProjectItem, { project_key: string }>(api, param)
   }
 
-  get_file_content<T = string | mdDataType | excelDataType | fileContent | xmindDataType>(param: { file_path: string }): Promise<FileResponseType<T>> {
+  get_file_content<T = string | mdDataType | excelDataType | fileContent >(param: { file_path: string }): Promise<FileResponseType<T>> {
     const api = `/file_handle/file/read/`;
     const lowerCasePath = param.file_path.toLowerCase();
     const fileType = ['pdf', 'doc', 'docx', 'ppt', 'pptx'] //转成pdf返回
@@ -72,9 +70,6 @@ class projectService {
     }
     if (lowerCasePath.endsWith('.png') || lowerCasePath.endsWith('.jpg')) {
       return HttpClient.fetchBinaryFile('/file_handle/file/read/', param) as Promise<FileResponseType<T>>;
-    }
-    if (lowerCasePath.endsWith('.xmind')) {
-      return HttpClient.post<xmindDataType, { file_path: string }>(api, param) as Promise<FileResponseType<T>>;
     }
     return HttpClient.post<fileContent, { file_path: string }>(api, param) as Promise<FileResponseType<T>>;
   }

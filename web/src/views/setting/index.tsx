@@ -27,19 +27,32 @@ function SettingsPage() {
   const getProjectList = () => {
     ProjectService.get_all_projects().then((res) => {
       if (res.code == 0) {
-        const withEditState: projectItem[] = res.data.map((item: projectItem) => ({ ...item, isEditing: false }));
+        const withEditState: projectItem[] = Array.isArray(res.data) ? res.data.map((item: projectItem) => ({ ...item, isEditing: false })) : [];
         setProjects(withEditState);
         setOriginalProjects(withEditState); // 保存原始数据
+      } else {
+        setProjects([]);
+        setOriginalProjects([]);
       }
-    })
+    }).catch(err => {
+      console.error('获取项目列表失败:', err);
+      setProjects([]);
+      setOriginalProjects([]);
+    });
   }
 
   const getProjectPath = () => {
     ProjectService.get_system_path().then((res) => {
       if (res.code == 0) {
-        setFilePath(res.data);
+        const path = typeof res.data === 'string' ? res.data : '';
+        setFilePath(path);
+      } else {
+        setFilePath('');
       }
-    })
+    }).catch(err => {
+      console.error('获取系统路径失败:', err);
+      setFilePath('');
+    });
   };
 
   const handleSavePath = () => {
@@ -149,14 +162,14 @@ function SettingsPage() {
       render: (text: string, record: projectItem) =>
         record.isEditing ? (
           <Input
-            value={text}
+            value={text || ''}
             style={{ width: '100%' }}
             onChange={(e) =>
               handleChange(e.target.value, 'project_name', record.id)
             }
           />
         ) : (
-          <span>{text}</span>
+          <span>{text || ''}</span>
         ),
     },
     {
@@ -166,14 +179,14 @@ function SettingsPage() {
       render: (text: string, record: projectItem) =>
         record.isEditing ? (
           <Input
-            value={text}
+            value={text || ''}
             style={{ width: '100%' }}
             onChange={(e) =>
               handleChange(e.target.value, 'project_key', record.id)
             }
           />
         ) : (
-          <span>{text}</span>
+          <span>{text || ''}</span>
         ),
     },
     {
@@ -183,20 +196,20 @@ function SettingsPage() {
       render: (text: string, record: projectItem) =>
         record.isEditing ? (
           <Input
-            value={text}
+            value={text || ''}
             style={{ width: '100%' }}
             onChange={(e) =>
               handleChange(e.target.value, 'visible_users', record.id)
             }
           />
         ) : (
-          <span>{text}</span>
+          <span>{text || ''}</span>
         ),
     },
     {
       title: '操作',
       dataIndex: 'action',
-      width: 200, // 增加操作列的宽度，以适应两个按钮
+      width: 200,
       render: (_: string, record: projectItem) => (
         <Space size="small">
           {record.isEditing ? (

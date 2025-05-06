@@ -26,7 +26,6 @@ const PageLayout: React.FC = () => {
   const [leftMenuData, setLeftMenuData] = useState<FileTree>([]);
   type MenuItem = GetProp<MenuProps, 'items'>[number];
   const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys, triggeredBySearch: reduxTriggeredBySearch } = useAppSelector(state => state.menu);
-
   const getCurrentProjectKey = () => {
     const pathSegments = decodeURIComponent(location.pathname).split('/');
     return pathSegments[1] === 'home' ? 'home' : pathSegments[1];
@@ -36,12 +35,15 @@ const PageLayout: React.FC = () => {
 
   // 从项目列表生成 MenuItems
   const projectMenuItems = useMemo(() => {
-    const items = projectsList.map(project => ({
-      key: project.project_key,
-      label: project.project_name,
-      type: 'item',
-    }));
-    items.unshift({ key: 'home', label: '首页', type: 'item' });
+    const items = [
+      { key: 'home', label: '首页', type: 'item' },
+      ...(Array.isArray(projectsList) ? projectsList.map(project => ({
+        key: project.project_key,
+        label: project.project_name,
+        type: 'item',
+      })) : []),
+      { key: 'external', label: '外部地址', type: 'item' }
+    ];
     return items;
   }, [projectsList]);
 
@@ -69,10 +71,10 @@ const PageLayout: React.FC = () => {
 
   useEffect(() => {
     const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
-    if (!loading && projectsList.some(p => p.project_key === currentProjectKey)) {
+    if (!loading && Array.isArray(projectsList) && projectsList.some(p => p.project_key === currentProjectKey)) {
       setCurrentKey(currentProjectKey);
       projectKey.current = currentProjectKey;
-      if (currentProjectKey !== 'home') get_children_tree(currentProjectKey);
+      get_children_tree(currentProjectKey);
     }
   }, [loading, projectsList, location.pathname]);
 
@@ -140,10 +142,12 @@ const PageLayout: React.FC = () => {
     setCurrentKey(key);
     if (selectedRoute) {
       projectKey.current = key;
-      if (key == 'home') {
-        navigate('/home'); // 跳转到首页
-      } else {
+      if (key === 'home' || key === 'external') {
+        navigate(`${key}`);
+      } else if (Array.isArray(projectsList) && projectsList.some(p => p.project_key === key)) {
         get_children_tree(key); // 更新左侧菜单的文件树
+      } else {
+        navigate(`${key}`); // 跳转到外部地址
       }
     }
   };
@@ -214,11 +218,16 @@ const PageLayout: React.FC = () => {
       </Header>
 
       <Layout className="main-layout">
-        {projectMenuItems.some(item => item?.key === currentKey) && currentKey !== 'home' && leftMenuData && (
-          <LeftMenu
-            data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}
-            projectKey={projectKey.current} />
-        )}
+        {projectMenuItems.some(item => item?.key === currentKey) &&
+          currentKey !== 'home' &&
+          currentKey !== 'external' &&
+          Array.isArray(projectsList) &&
+          projectsList.some(p => p.project_key === currentKey) &&
+          leftMenuData && (
+            <LeftMenu
+              data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}
+              projectKey={projectKey.current} />
+          )}
         <Layout>
           <Content className="content">
             <Outlet key={location.pathname} />
