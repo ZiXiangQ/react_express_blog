@@ -24,9 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-7_1ridg6d7#@r#azd-a8=^aud%if)q^=vj!hcofjna%g1-7oa-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1', '192.168.43.99','192.168.110.247', '172.20.10.2']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1 [::1]').split()
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -77,6 +78,8 @@ WSGI_APPLICATION = 'djangoBlog.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8081",
+    "http://localhost:80",
+    "http://localhost",
     "http://192.168.43.99:3000",
     "http://192.168.43.99:8081",
     "http://172.20.10.2:8081"
@@ -106,7 +109,7 @@ DATABASES = {
         'NAME': 'express_user_db',
         'USER': 'root',
         'PASSWORD': 'WANGyan9059.',
-        'HOST': 'localhost',
+        'HOST': os.environ.get('DB_HOST', 'mysql'),
         'PORT': '3306',
     }
 }
@@ -152,7 +155,7 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-FILE_HANDLE_API_BASE = "http://127.0.0.1:11055"
+FILE_HANDLE_API_BASE = "http://127.0.0.1:8000"
 
 # 项目根路径，比如 /Users/qiuzx/workspace/react_diango_blog
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -165,6 +168,6 @@ STATICFILES_DIRS = [
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': f'redis://{os.environ.get("REDIS_HOST", "127.0.0.1")}:{os.environ.get("REDIS_PORT", "6379")}/1',
     }
 }
