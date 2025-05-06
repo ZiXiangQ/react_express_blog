@@ -11,8 +11,9 @@ import PageLayout from '@/views/pageLayout';
 import UserHandle from '@/views/userHandle';
 import FileContent from '@/views/fileContent';
 import Setting from '@/views/setting';
-import { RoutesTypeNew } from '@/types/routes';
 import HomePage from '@/views/homePage';
+import ExternalPage from '@/views/external';
+import { RoutesTypeNew } from '@/types/routes';
 
 /**
  * @description: 全局路由配置
@@ -58,6 +59,13 @@ const routes: RoutesTypeNew = [
                     title: "首页",
                     noLogin: true,
                     hideMenu: true,
+                },
+            },
+            {
+                path: "external",
+                element: <ExternalPage />,
+                meta: {
+                    title: "外部地址",
                 },
             },
             {
