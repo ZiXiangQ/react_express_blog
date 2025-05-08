@@ -2,27 +2,22 @@ version: '3.8'
 
 services:
   frontend:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
     image: blog-frontend:latest
     ports:
       - "80:80"
     depends_on:
       - backend
     restart: always
-
+ 
   backend:
-    build:
-      context: ./djangoBlog
-      dockerfile: Dockerfile
     image: blog-backend:latest
     ports:
-      - "8000:8000"
+      - "8000:8000"   
     volumes:
-      - ./blog_temp_data:/app/blog_temp_data
-    env_file: 
-      - .env
+      - /Users/qiuzx/workspace/blog_doc:/app/data  ## 挂载本地目录到容器，对应修改，同时保证数据库的挂载目录一致
+    environment:
+      - HOST_DATA_PATH=/Users/qiuzx/workspace/blog_doc  ## 挂载本地目录到容器，对应修改，同时保证数据库的挂载目录一致
+      - CONTAINER_DATA_PATH=/app/data
     depends_on:
       - redis
       - mysql

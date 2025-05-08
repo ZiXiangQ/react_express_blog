@@ -160,10 +160,8 @@ FILE_HANDLE_API_BASE = "http://127.0.0.1:8000"
 # 项目根路径，比如 /Users/qiuzx/workspace/react_diango_blog
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 添加 mockdata 静态目录
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'mockdata'),
-]
+HOST_DATA_PATH = os.environ.get('HOST_DATA_PATH', '/Users/qiuzx/workspace/blog_doc')
+CONTAINER_DATA_PATH = os.environ.get('CONTAINER_DATA_PATH', '/app/data')
 
 CACHES = {
     'default': {

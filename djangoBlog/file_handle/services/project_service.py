@@ -59,13 +59,18 @@ class ProjectService:
         try:
             sysSetting = SystemSetting.objects.all().first()
             if not sysSetting:
-                return False, "系统配置不存在"
+                # 如果系统配置不存在，创建新的配置
+                sysSetting = SystemSetting(
+                    system_config_path=data.get('system_config_path', '')
+                )
+                sysSetting.save()
+                return 0, "success", "系统配置初始化成功"
             # 更新系统配置路径
             sysSetting.system_config_path = data.get('system_config_path', sysSetting.system_config_path)
             sysSetting.save()
             return 0, "success", "系统配置路径更新成功"
         except Exception as e:
-            return -1, "error",str(e)
+            return -1, "error", str(e)
 
     @staticmethod
     def get_children_tree(path):
@@ -73,9 +78,28 @@ class ProjectService:
         遍历给定路径下的文件夹和文件，返回一个层级递进的字典结构。
         :param path: 需要遍历的根目录路径
         :return: 返回一个递进的字典，包含文件和文件夹的树形结构
-        """
-        root_path = SystemSetting.objects.first().system_config_path
-        project_path = os.path.join(root_path, path)  # 确保路径是绝对路径
+        """        
+        sysSetting = SystemSetting.objects.first()
+        if not sysSetting:
+            raise APIException('系统配置不存在，请先配置系统路径')
+
+        root_path = sysSetting.system_config_path
+        if not root_path:
+            raise APIException('系统配置路径为空，请先配置系统路径')
+        
+        # 获取环境变量中的路径配置
+        host_path = os.environ.get('HOST_DATA_PATH', '')
+        container_path = os.environ.get('CONTAINER_DATA_PATH', '/app/data')
+        
+        # 如果路径是主机路径，转换为容器路径
+        if host_path and root_path.startswith(host_path):
+            root_path = root_path.replace(host_path, container_path)
+        
+        # 确保path是相对路径
+        if path.startswith('/'):
+            path = path[1:]
+            
+        project_path = os.path.join(root_path, path)
         if not os.path.exists(project_path):
             raise APIException('路径不存在')
         
