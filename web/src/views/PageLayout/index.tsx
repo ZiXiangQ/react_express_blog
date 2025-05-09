@@ -4,7 +4,7 @@ import type { GetProp, MenuProps } from 'antd';
 import { Divider, Dropdown, Layout, Menu, message } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ProjectService from '@/services/api/project';
-import { childProjectItem, folderKey, projectItem, projectList, FileTree, fileKey } from '@/types/project';
+import { childProjectItem, folderKey, FileTree, fileKey } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 import logo from '@/assets/logopika.svg';
@@ -13,16 +13,18 @@ import { useDispatch } from 'react-redux';
 import { setSelectedKeys } from '@/store/slices/menuSlice';
 import LeftMenu from './component/leftMenu';
 import SearchComponent from './component/search';
+import { useProjects } from '@/hooks/useProject';
 
 const PageLayout: React.FC = () => {
   const { Header, Content } = Layout;
+  const { projects } = useProjects();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  const [loading, setLoading] = useState<boolean>(true);
+  // const [loading, setLoading] = useState<boolean>(true);
   const [username, setUsername] = useState<string>("");
-  const [projectsList, setProjectsList] = useState<projectItem[]>([]);
+  // const [projectsList, setProjectsList] = useState<projectItem[]>([]);
   const [leftMenuData, setLeftMenuData] = useState<FileTree>([]);
   type MenuItem = GetProp<MenuProps, 'items'>[number];
   const { selectedKeys: reduxSelectedKeys, openKeys: reduxOpenKeys, triggeredBySearch: reduxTriggeredBySearch } = useAppSelector(state => state.menu);
@@ -37,7 +39,7 @@ const PageLayout: React.FC = () => {
   const projectMenuItems = useMemo(() => {
     const items = [
       { key: 'home', label: '首页', type: 'item' },
-      ...(Array.isArray(projectsList) ? projectsList.map(project => ({
+      ...(Array.isArray(projects) ? projects.map(project => ({
         key: project.project_key,
         label: project.project_name,
         type: 'item',
@@ -45,7 +47,7 @@ const PageLayout: React.FC = () => {
       { key: 'external', label: '外部地址', type: 'item' }
     ];
     return items;
-  }, [projectsList]);
+  }, [projects]);
 
   useEffect(() => { //初始化用户信息
     const storeUsername = localStorage.getItem('username');
@@ -60,23 +62,23 @@ const PageLayout: React.FC = () => {
     }
   }, [reduxSelectedKeys, reduxOpenKeys])
 
-  useEffect(() => { //初始化项目列表
-    ProjectService.get_all_projects().then((rsp: projectList) => {
-      if (rsp.code == 0) {
-        setProjectsList(rsp.data);
-        setLoading(false);  // 数据加载完成，设置加载状态为 false
-      }
-    });
-  }, []);
+  // useEffect(() => { //初始化项目列表
+  //   ProjectService.get_all_projects().then((rsp: projectList) => {
+  //     if (rsp.code == 0) {
+  //       setProjectsList(rsp.data);
+  //       setLoading(false);  // 数据加载完成，设置加载状态为 false
+  //     }
+  //   });
+  // }, []);
 
   useEffect(() => {
     const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
-    if (!loading && Array.isArray(projectsList) && projectsList.some(p => p.project_key === currentProjectKey)) {
+    if ( Array.isArray(projects) && projects.some(p => p.project_key === currentProjectKey)) {
       setCurrentKey(currentProjectKey);
       projectKey.current = currentProjectKey;
       get_children_tree(currentProjectKey);
     }
-  }, [loading, projectsList, location.pathname]);
+  }, [ projects, location.pathname]);
 
 
   const get_children_tree = (currentKey: string) => {
@@ -144,7 +146,7 @@ const PageLayout: React.FC = () => {
       projectKey.current = key;
       if (key === 'home' || key === 'external') {
         navigate(`${key}`);
-      } else if (Array.isArray(projectsList) && projectsList.some(p => p.project_key === key)) {
+      } else if (Array.isArray(projects) && projects.some(p => p.project_key === key)) {
         get_children_tree(key); // 更新左侧菜单的文件树
       } else {
         navigate(`${key}`); // 跳转到外部地址
@@ -221,8 +223,8 @@ const PageLayout: React.FC = () => {
         {projectMenuItems.some(item => item?.key === currentKey) &&
           currentKey !== 'home' &&
           currentKey !== 'external' &&
-          Array.isArray(projectsList) &&
-          projectsList.some(p => p.project_key === currentKey) &&
+          Array.isArray(projects) &&
+          projects.some(p => p.project_key === currentKey) &&
           leftMenuData && (
             <LeftMenu
               data={Array.isArray(leftMenuData) ? leftMenuData : transformData(leftMenuData)}

@@ -11,13 +11,13 @@ import {
 import ProjectService from '@/services/api/project';
 import { projectItem } from '@/types/project';
 import '@/styles/theme.css';
-
+import { useProjects } from '@/hooks/useProject';
 
 function SettingsPage() {
-  const [filePath, setFilePath] = useState(''); // 文件路径
-  const [isEditingPath, setIsEditingPath] = useState(false); // 是否编辑文件路径
-  const [projects, setProjects] = useState<projectItem[]>([]); // 项目列表
-  const [originalProjects, setOriginalProjects] = useState<projectItem[]>([]); // 保存原始项目数据，用于取消编辑
+  const [filePath, setFilePath] = useState('');
+  const [isEditingPath, setIsEditingPath] = useState(false);
+  const [originalProjects, setOriginalProjects] = useState<projectItem[]>([]);
+  const { projects, updateProjects, cancelEdit } = useProjects();
 
   useEffect(() => {
     getProjectList();
@@ -28,16 +28,14 @@ function SettingsPage() {
     ProjectService.get_all_projects().then((res) => {
       if (res.code == 0) {
         const withEditState: projectItem[] = Array.isArray(res.data) ? res.data.map((item: projectItem) => ({ ...item, isEditing: false })) : [];
-        setProjects(withEditState);
-        setOriginalProjects(withEditState); // 保存原始数据
+        updateProjects(withEditState);
+        setOriginalProjects(withEditState);
       } else {
-        setProjects([]);
-        setOriginalProjects([]);
+        updateProjects([]);
       }
     }).catch(err => {
       console.error('获取项目列表失败:', err);
-      setProjects([]);
-      setOriginalProjects([]);
+      updateProjects([]);
     });
   }
 
@@ -72,13 +70,13 @@ function SettingsPage() {
 
   const handleAddProject = () => {
     const newProject = {
-      id: Date.now(), // 临时ID，保存后会替换为服务器返回的ID
+      id: Date.now(),
       project_name: '',
       project_key: '',
       visible_users: '',
       isEditing: true,
     };
-    setProjects([...projects, newProject]);
+    updateProjects([...projects, newProject]);
   };
 
   const handleChange = (value: string, key: string, id: number) => {
@@ -88,20 +86,19 @@ function SettingsPage() {
       }
       return project;
     });
-    setProjects(updatedProjects);
+    updateProjects(updatedProjects);
   };
 
   const handleSave = (id: number) => {
     const projectToSave = projects.find(project => project.id === id);
     if (projectToSave) {
-      const isNewProject = !originalProjects.some(p => p.id === id);
+      const isNewProject = !projects.some(p => p.id === id && !p.isEditing);
       if (isNewProject) {
-        // 新增项目
         ProjectService.add_project(projectToSave).then((res) => {
           if (res.code === 0) {
             message.success(res.message || '添加成功');
             toggleEdit(id, false);
-            getProjectList(); // 重新获取项目列表，以获取服务器返回的ID
+            getProjectList();
           } else {
             message.error(res.message || '添加失败');
           }
@@ -110,12 +107,11 @@ function SettingsPage() {
           message.error('添加失败');
         });
       } else {
-        // 更新项目
         ProjectService.update_project(projectToSave).then((res) => {
           if (res.code === 0) {
             message.success(res.message || '更新成功');
             toggleEdit(id, false);
-            getProjectList(); // 重新获取项目列表
+            getProjectList();
           } else {
             message.error(res.message || '更新失败');
           }
@@ -140,17 +136,18 @@ function SettingsPage() {
     const updated = projects.map((project) =>
       project.id === id ? { ...project, isEditing: edit } : project
     );
-
-    setProjects(updated);
+    updateProjects(updated);
   };
 
-  const cancelEdit = (id: number) => {
-    const originalProject = originalProjects.find(p => p.id === id);
-    if (originalProject) {
-      const updated = projects.map((project) =>
-        project.id === id ? { ...originalProject, isEditing: false } : project
-      );
-      setProjects(updated);
+  const handleCancelEdit = (id: number) => {
+    const isNewProject = !originalProjects.some(p => p.id === id);
+    if (isNewProject) {
+      // 如果是新项目，直接移除
+      const updatedProjects = projects.filter(project => project.id !== id);
+      updateProjects(updatedProjects);
+    } else {
+      // 如果是编辑现有项目，恢复到原始状态
+      cancelEdit(id, originalProjects);
     }
   };
 
@@ -223,7 +220,7 @@ function SettingsPage() {
               </Button>
               <Button
                 size="small"
-                onClick={() => cancelEdit(record.id)}
+                onClick={() => handleCancelEdit(record.id)}
               >
                 取消
               </Button>
