@@ -9,11 +9,10 @@ import { Card, Input, Typography, Row, Col, Button, Space } from "antd";
 import {
   SearchOutlined,
   BookOutlined,
-  // ClockCircleOutlined,
-  // RocketOutlined,
+  ClockCircleOutlined,
+  RocketOutlined,
 } from "@ant-design/icons";
 import "./index.less";
-import GithubInfo from "@/views/homePage/GithubInfo";
 
 const { Title, Text } = Typography;
 
@@ -41,11 +40,10 @@ export default function KnowledgeBaseHome() {
 
         {/* 内容区域 */}
         <Row gutter={[24, 24]}>
-          {/* 推荐文档 */}
           <Col xs={24} md={12}>
             <Card className="kb-section-card kb-border-blue">
               <Title level={4} className="kb-section-title kb-text-blue">
-                <BookOutlined className="kb-icon" /> 推荐文档
+                <BookOutlined className="kb-icon" />推荐文档
               </Title>
               <Space direction="vertical" className="kb-button-group">
                 <Button type="link" className="kb-link-button">
@@ -61,9 +59,8 @@ export default function KnowledgeBaseHome() {
             </Card>
           </Col>
 
-          {/* 最近更新 */}
           <Col xs={24} md={12}>
-            {/* <Card className="kb-section-card kb-border-green">
+            <Card className="kb-section-card kb-border-green">
               <Title level={4} className="kb-section-title kb-text-green">
                 <ClockCircleOutlined className="kb-icon" /> 最近更新
               </Title>
@@ -72,12 +69,10 @@ export default function KnowledgeBaseHome() {
                 <li>📅 2025-04-20 - 更新 数据同步机制说明</li>
                 <li>📅 2025-04-15 - 修复 FAQ 文档中的错误</li>
               </ul>
-            </Card> */}
-            <GithubInfo />
+            </Card>
           </Col>
-          {/*  */}
-          {/* 快速上手 */}
-          {/* <Col span={24}>
+          
+          <Col span={24}>
             <Card className="kb-section-card kb-border-purple">
               <Title level={4} className="kb-section-title kb-text-purple">
                 <RocketOutlined className="kb-icon" /> 快速上手
@@ -97,7 +92,7 @@ export default function KnowledgeBaseHome() {
                 </Button>
               </Space>
             </Card>
-          </Col> */}
+          </Col> 
         </Row>
       </div>
     </div>

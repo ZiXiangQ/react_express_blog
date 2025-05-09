@@ -27,6 +27,7 @@ import re
 from xml.etree import ElementTree as ET
 import json
 from xmindparser import xmind_to_dict
+from file_handle.services.project_service import ProjectService
 
 
 class FileService:
@@ -43,15 +44,26 @@ class FileService:
     
     @staticmethod
     def fix_image_paths(md_content, md_file_path, base_url):
-        md_dir = os.path.dirname(md_file_path)
-        # 截掉本地路径开头，保留相对的 web 路径
-        # 你的mockdata在'/Users/qiuzx/workspace/react_diango_blog/mockdata'
-        relative_dir = os.path.relpath(md_dir, '/Users/qiuzx/workspace/react_diango_blog/mockdata')
+        """
+        修复 Markdown 文件中的图片路径
+        :param md_content: Markdown 内容
+        :param md_file_path: Markdown 文件路径
+        :param base_url: 静态文件基础URL
+        """
+        # 获取系统配置的文档库路径
+        doc_root = ProjectService.get_system_path()
+        if not doc_root:
+            raise APIException('系统配置路径不存在，请先配置系统路径')
+        # 从配置路径中提取最后一段作为 URL 前缀
+        url_prefix = os.path.basename(doc_root)
+        # 计算相对路径
+        relative_dir = os.path.relpath(os.path.dirname(md_file_path), doc_root)
         def replace_src(match):
             src_value = match.group(1)
             if src_value.startswith('http'):
                 return match.group(0)
-            full_url = f"{base_url.rstrip('/')}/{relative_dir.rstrip('/')}/{src_value.lstrip('/')}"
+            print(base_url,'1212121')
+            full_url = f"{base_url}/{url_prefix}/{relative_dir.rstrip('/')}/{src_value.lstrip('/')}"
             return f'src="{full_url}"'
         return re.sub(r'src="([^"]+)"', replace_src, md_content)
 
@@ -196,7 +208,7 @@ class FileService:
                         fixed_content = FileService.fix_image_paths(
                             post.content,
                             file_path,
-                            'http://127.0.0.1:11055/mockdata'   # 你的静态访问前缀
+                            f'{settings.FILE_HANDLE_API_BASE}'   # 使用配置的URL前缀
                         )
                         return {
                             'content': fixed_content,  # 原始Markdown文本

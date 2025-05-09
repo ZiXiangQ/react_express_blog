@@ -134,10 +134,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -146,16 +142,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-FILE_HANDLE_API_BASE = "http://127.0.0.1:8000"
+# 文件处理API基础URL,md获取图片时使用
+FILE_HANDLE_API_BASE = "http://127.0.0.1:8000" 
 
 # 项目根路径，比如 /Users/qiuzx/workspace/react_diango_blog
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
