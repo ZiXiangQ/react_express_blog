@@ -34,7 +34,7 @@ RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip install -r requirements.txt
 
 # 设置环境变量
-ENV HOST_DATA_PATH=/Users/qiuzx/workspace/blog_doc
+ENV HOST_DATA_PATH=/Users/qiuzx/Documents
 ENV CONTAINER_DATA_PATH=/app/data
 
 # 暴露端口

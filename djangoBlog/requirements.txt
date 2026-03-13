@@ -1,5 +1,4 @@
 asgiref==3.8.1
-# aspose-words==25.4.0 已移除，因为无法通过 pip 安装
 async-timeout==5.0.1
 certifi==2025.1.31
 cffi==1.17.1
