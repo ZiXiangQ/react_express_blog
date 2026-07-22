@@ -4,7 +4,7 @@ import type { GetProp, MenuProps } from 'antd';
 import { Divider, Dropdown, Layout, Menu, message } from 'antd';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import ProjectService from '@/services/api/project';
-import { childProjectItem, folderKey, FileTree, fileKey } from '@/types/project';
+import { childProjectItem, folderKey, FileTree, fileKey, projectList } from '@/types/project';
 import { useTheme } from '@/contexts/ThemeContext';
 import './index.less';
 import logo from '@/assets/logopika.svg';
@@ -17,7 +17,7 @@ import { useProjects } from '@/hooks/useProject';
 
 const PageLayout: React.FC = () => {
   const { Header, Content } = Layout;
-  const { projects } = useProjects();
+  const { projects, updateProjects } = useProjects();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -62,14 +62,15 @@ const PageLayout: React.FC = () => {
     }
   }, [reduxSelectedKeys, reduxOpenKeys])
 
-  // useEffect(() => { //初始化项目列表
-  //   ProjectService.get_all_projects().then((rsp: projectList) => {
-  //     if (rsp.code == 0) {
-  //       setProjectsList(rsp.data);
-  //       setLoading(false);  // 数据加载完成，设置加载状态为 false
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => { //初始化项目列表：应用启动即自动加载文档库列表（后端已根据 config 根路径自动扫描持久化）
+    ProjectService.get_all_projects().then((rsp: projectList) => {
+      if (rsp.code == 0) {
+        updateProjects(Array.isArray(rsp.data) ? rsp.data : []);
+      }
+    }).catch(err => {
+      console.error('获取项目列表失败:', err);
+    });
+  }, []);
 
   useEffect(() => {
     const currentProjectKey = getCurrentProjectKey();  // 先不删除，重复请求问题，防止隐藏bug
@@ -164,20 +165,9 @@ const PageLayout: React.FC = () => {
     <Menu>
       <Menu.Item key="1" onClick={() => navigate('/userHandle')}>用户管理</Menu.Item>
       <Menu.Item key="2" onClick={() => navigate('/setting')}>系统设置</Menu.Item>
-      <Menu.Item key="3" onClick={() => {
-        localStorage.removeItem('username');
-        navigate('/login');
-        message.success('登出成功');
-        //关闭侧边栏
-        dispatch(setSelectedKeys({
-          selectedKeys: [],
-          openKeys: [],
-          currentPath: '',
-          triggeredBySearch: false,
-        }));
-      }}>登出</Menu.Item>
     </Menu>
   );
+
 
   return (
     <Layout className={`layout ${theme}`}>

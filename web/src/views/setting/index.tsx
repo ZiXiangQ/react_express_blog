@@ -1,268 +1,138 @@
+/*
+ * @Description: 系统设置页 - 简化为"配置根路径 + 自动扫描文档库"
+ * 说明：项目（文档库）不再需要手动增删改，只需配置 config 指定的根路径，
+ * 系统会自动扫描该路径下的一级目录作为文档库，并持久化同步到项目列表。
+ */
 import React, { useEffect, useState } from 'react';
 import {
   Input,
   Button,
   message,
   Table,
-  Popconfirm,
-  Space,
   Divider,
+  Space,
+  Tag,
+  Empty,
 } from 'antd';
+import { ReloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import ProjectService from '@/services/api/project';
-import { projectItem } from '@/types/project';
+import { projectItem, projectList, sysPath } from '@/types/project';
 import '@/styles/theme.css';
 import { useProjects } from '@/hooks/useProject';
 
 function SettingsPage() {
   const [filePath, setFilePath] = useState('');
   const [isEditingPath, setIsEditingPath] = useState(false);
-  const [originalProjects, setOriginalProjects] = useState<projectItem[]>([]);
-  const { projects, updateProjects, cancelEdit } = useProjects();
+  const [scanning, setScanning] = useState(false);
+  const { projects, updateProjects } = useProjects();
 
   useEffect(() => {
-    getProjectList();
     getProjectPath();
+    getProjectList();
   }, []);
 
+  // 获取当前已持久化的项目列表（后端自动扫描结果）
   const getProjectList = () => {
-    ProjectService.get_all_projects().then((res) => {
-      if (res.code == 0) {
-        const withEditState: projectItem[] = Array.isArray(res.data) ? res.data.map((item: projectItem) => ({ ...item, isEditing: false })) : [];
-        updateProjects(withEditState);
-        setOriginalProjects(withEditState);
+    ProjectService.get_all_projects().then((res: projectList) => {
+      if (res.code === 0) {
+        updateProjects(Array.isArray(res.data) ? res.data : []);
       } else {
         updateProjects([]);
       }
-    }).catch(err => {
+    }).catch((err) => {
       console.error('获取项目列表失败:', err);
       updateProjects([]);
     });
-  }
+  };
 
   const getProjectPath = () => {
-    ProjectService.get_system_path().then((res) => {
-      if (res.code == 0) {
-        const path = typeof res.data === 'string' ? res.data : '';
-        setFilePath(path);
+    ProjectService.get_system_path().then((res: sysPath) => {
+      if (res.code === 0) {
+        setFilePath(typeof res.data === 'string' ? res.data : '');
       } else {
         setFilePath('');
       }
-    }).catch(err => {
+    }).catch((err) => {
       console.error('获取系统路径失败:', err);
       setFilePath('');
     });
   };
 
+  // 保存根路径：后端会在保存时自动扫描并同步项目列表
   const handleSavePath = () => {
     setIsEditingPath(false);
-    ProjectService.modify_system_path({id:1,system_config_path:filePath}).then((res) => {
-      if (res.code == 0) {
-        message.success(res.message);
+    ProjectService.modify_system_path({ id: 1, system_config_path: filePath }).then((res) => {
+      if (res.code === 0) {
+        message.success(res.message || '保存成功，已自动扫描文档库');
+        getProjectList();
       } else {
-        message.error(res.message);
+        message.error(res.message || '保存失败');
       }
-    })
+    }).catch((err) => {
+      console.error(err);
+      message.error('保存失败');
+    });
   };
 
   const handleEditPath = () => {
     setIsEditingPath(true);
   };
 
-  const handleAddProject = () => {
-    const newProject = {
-      id: Date.now(),
-      project_name: '',
-      project_key: '',
-      visible_users: '',
-      isEditing: true,
-    };
-    updateProjects([...projects, newProject]);
-  };
-
-  const handleChange = (value: string, key: string, id: number) => {
-    const updatedProjects = projects.map((project) => {
-      if (project.id === id) {
-        return { ...project, [key]: value };
-      }
-      return project;
-    });
-    updateProjects(updatedProjects);
-  };
-
-  const handleSave = (id: number) => {
-    const projectToSave = projects.find(project => project.id === id);
-    if (projectToSave) {
-      const isNewProject = !projects.some(p => p.id === id && !p.isEditing);
-      if (isNewProject) {
-        ProjectService.add_project(projectToSave).then((res) => {
-          if (res.code === 0) {
-            message.success(res.message || '添加成功');
-            toggleEdit(id, false);
-            getProjectList();
-          } else {
-            message.error(res.message || '添加失败');
-          }
-        }).catch(err => {
-          console.error(err);
-          message.error('添加失败');
-        });
-      } else {
-        ProjectService.update_project(projectToSave).then((res) => {
-          if (res.code === 0) {
-            message.success(res.message || '更新成功');
-            toggleEdit(id, false);
-            getProjectList();
-          } else {
-            message.error(res.message || '更新失败');
-          }
-        }).catch(err => {
-          console.error(err);
-          message.error('更新失败');
-        });
-      }
-    }
-  };
-
-  const handleDelete = (id: number) => {
-    ProjectService.delete_project(id).then((res) => {
+  // 手动触发重新扫描（例如新增/删除了子目录后，无需重新保存路径也能刷新）
+  const handleRescan = () => {
+    setScanning(true);
+    ProjectService.scan_root().then((res: projectList) => {
       if (res.code === 0) {
-        message.success(res.message);
-        getProjectList();
+        message.success('扫描成功，文档库已更新');
+        updateProjects(Array.isArray(res.data) ? res.data : []);
+      } else {
+        message.error(res.message || '扫描失败');
       }
+    }).catch((err) => {
+      console.error(err);
+      message.error('扫描失败，请检查路径是否正确');
+    }).finally(() => {
+      setScanning(false);
     });
-  };
-
-  const toggleEdit = (id: number, edit: boolean) => {
-    const updated = projects.map((project) =>
-      project.id === id ? { ...project, isEditing: edit } : project
-    );
-    updateProjects(updated);
-  };
-
-  const handleCancelEdit = (id: number) => {
-    const isNewProject = !originalProjects.some(p => p.id === id);
-    if (isNewProject) {
-      // 如果是新项目，直接移除
-      const updatedProjects = projects.filter(project => project.id !== id);
-      updateProjects(updatedProjects);
-    } else {
-      // 如果是编辑现有项目，恢复到原始状态
-      cancelEdit(id, originalProjects);
-    }
   };
 
   const columns = [
     {
-      title: '项目名称',
+      title: '文档库名称',
       dataIndex: 'project_name',
-      width: 200,
-      render: (text: string, record: projectItem) =>
-        record.isEditing ? (
-          <Input
-            value={text || ''}
-            style={{ width: '100%' }}
-            onChange={(e) =>
-              handleChange(e.target.value, 'project_name', record.id)
-            }
-          />
-        ) : (
-          <span>{text || ''}</span>
-        ),
-    },
-    {
-      title: '项目标识',
-      dataIndex: 'project_key',
-      width: 200,
-      render: (text: string, record: projectItem) =>
-        record.isEditing ? (
-          <Input
-            value={text || ''}
-            style={{ width: '100%' }}
-            onChange={(e) =>
-              handleChange(e.target.value, 'project_key', record.id)
-            }
-          />
-        ) : (
-          <span>{text || ''}</span>
-        ),
-    },
-    {
-      title: '可见用户',
-      dataIndex: 'visible_users',
-      width: 300,
-      render: (text: string, record: projectItem) =>
-        record.isEditing ? (
-          <Input
-            value={text || ''}
-            style={{ width: '100%' }}
-            onChange={(e) =>
-              handleChange(e.target.value, 'visible_users', record.id)
-            }
-          />
-        ) : (
-          <span>{text || ''}</span>
-        ),
-    },
-    {
-      title: '操作',
-      dataIndex: 'action',
-      width: 200,
-      render: (_: string, record: projectItem) => (
-        <Space size="small">
-          {record.isEditing ? (
-            <>
-              <Button
-                type="primary"
-                size="small"
-                onClick={() => handleSave(record.id)}
-              >
-                保存
-              </Button>
-              <Button
-                size="small"
-                onClick={() => handleCancelEdit(record.id)}
-              >
-                取消
-              </Button>
-            </>
-          ) : (
-            <Button
-              size="small"
-              onClick={() => toggleEdit(record.id, true)}
-            >
-              编辑
-            </Button>
-          )}
-          <Popconfirm
-            title="确认删除该项目？"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button danger size="small">
-              删除
-            </Button>
-          </Popconfirm>
+      render: (text: string) => (
+        <Space>
+          <FolderOpenOutlined style={{ color: '#1677ff' }} />
+          <span>{text}</span>
         </Space>
       ),
+    },
+    {
+      title: '目录标识',
+      dataIndex: 'project_key',
+      render: (text: string) => <Tag>{text}</Tag>,
     },
   ];
 
   return (
-    <div style={{padding: 24}}>
+    <div style={{ padding: 24 }}>
       <Divider />
       {/* 文件路径配置 */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ margin: 0 }}>文件路径</h3>
-        <p style={{ margin: '5px 0 12px 0', color: 'var(--text-color)' }}>配置系统文件路径</p>
+        <h3 style={{ margin: 0 }}>文档根路径</h3>
+        <p style={{ margin: '5px 0 12px 0', color: 'var(--text-color)' }}>
+          配置文档库的根路径，系统会自动扫描该路径下的一级目录作为文档库，无需手动维护项目列表
+        </p>
         {isEditingPath ? (
           <>
             <Input
               value={filePath}
               onChange={(e) => setFilePath(e.target.value)}
-              placeholder="请输入文件路径"
-              style={{ width: 400, marginRight: 8 }}
+              placeholder="请输入文件路径，例如 /Users/xxx/workspace/blog_doc"
+              style={{ width: 420, marginRight: 8 }}
             />
             <Button type="primary" onClick={handleSavePath}>
-              保存
+              保存并扫描
             </Button>
           </>
         ) : (
@@ -270,7 +140,7 @@ function SettingsPage() {
             <span
               style={{
                 display: 'inline-block',
-                width: 400,
+                width: 420,
                 marginRight: 8,
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
@@ -286,25 +156,35 @@ function SettingsPage() {
 
       <Divider />
 
-      {/* 项目列表 */}
+      {/* 项目列表（只读，来自自动扫描结果） */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ margin: 0 }}>项目列表</h3>
-          <Button type="primary" onClick={handleAddProject}>
-            添加项目
+          <div>
+            <h3 style={{ margin: 0 }}>文档库列表</h3>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--text-color)' }}>
+              以下列表由系统根据根路径自动扫描生成，新增/删除文件夹后点击"重新扫描"即可同步
+            </p>
+          </div>
+          <Button icon={<ReloadOutlined />} loading={scanning} onClick={handleRescan}>
+            重新扫描
           </Button>
         </div>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={projects}
-          pagination={false}
-          bordered
-          size="middle"
-        />
+        {Array.isArray(projects) && projects.length > 0 ? (
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={projects as projectItem[]}
+            pagination={false}
+            bordered
+            size="middle"
+          />
+        ) : (
+          <Empty description="暂无文档库，请先配置根路径" />
+        )}
       </div>
     </div>
-  )
+  );
 }
 
 export default SettingsPage;
+

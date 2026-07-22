@@ -79,6 +79,11 @@ class projectService {
     return HttpClient.fetchPdf(api, param);  // 使用 fetchPdf 获取 PDF
   }
 
+  scan_root() { // 扫描根路径，自动获取项目列表
+    const api = '/file_handle/project/scan_root';
+    return HttpClient.post<projectList, PostBodyModel>(api, {});
+  }
+
 }
 const ProjectService = new projectService();
 export default ProjectService;

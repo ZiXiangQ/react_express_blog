@@ -4,7 +4,6 @@
  * @LastEditors: qiuzx
  * @Description: description
  */
-import Index from '@/views/login/index';
 import Page403 from '@/views/errorPage/page403';
 import Page404 from '@/views/errorPage/page404';
 import PageLayout from '@/views/pageLayout';
@@ -28,7 +27,7 @@ import { RoutesTypeNew } from '@/types/routes';
 const routes: RoutesTypeNew = [
     {
         path: "/",
-        redirect: "/login",
+        redirect: "/home",
     },
     {
         path: "/",
@@ -87,15 +86,6 @@ const routes: RoutesTypeNew = [
         ],
     },
     {
-        path: "/login",
-        element: <Index />,
-        meta: {
-            title: "登录",
-            noLogin: true,
-            hideMenu: true,
-        },
-    },
-    {
         path: "/403",
         element: <Page403 />,
         meta: {
@@ -116,3 +106,4 @@ const routes: RoutesTypeNew = [
 ];
 
 export { routes };
+

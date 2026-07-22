@@ -42,13 +42,9 @@ axios.interceptors.request.use(
 // 返回后拦截
 axios.interceptors.response.use(
     (response: AxiosResponse): Promise<AxiosResponse> => {
-    // 从第一次登录接口接收sid
+    // 从第一次登录接口接收sid（已废弃登录鉴权，此逻辑保留兼容旧接口，若不再需要可删除）
         if (response.headers.sid) {
             setCookie("token", response.headers.sid);
-        }
-        if(response.data.code === -2001){
-            window.location.hash="/login"
-            window.location.reload()
         }
         return Promise.resolve(response);
     },
@@ -60,3 +56,4 @@ axios.interceptors.response.use(
     }
 );
 export default axios;
+
