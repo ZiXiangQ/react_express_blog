@@ -51,3 +51,4 @@ def search_files(request: SearchRequest, db: Session = Depends(get_db)):
 
     print(f"[search] Found {len(results)} results")
     return {"code": 0, "data": results}
+
